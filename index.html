@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue Black Friday | Tunisian Careers Academy (TCA)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+    <!-- FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        tca: {
+                            dark: '#141414',
+                            card: '#1E1E1E',
+                            cream: '#FAF8F5',
+                            red: '#DC2626',
+                            redDark: '#B91C1C',
+                            gold: '#D4AF37',
+                            goldLight: '#F3E5AB',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-6px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #141414;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(220, 38, 38, 0.14) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(212, 175, 55, 0.12) 0%, transparent 40%);
+            color: #FAF8F5;
+            overflow-x: hidden;
+        }
+
+        .wheel-glow {
+            box-shadow: 0 0 45px rgba(212, 175, 55, 0.25), 0 0 80px rgba(220, 38, 38, 0.2);
+        }
+
+        .wheel-pointer {
+            filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.65));
+            transform-origin: 50% 15%;
+            transition: transform 0.08s ease-out;
+        }
+
+        .wheel-pointer.tick {
+            transform: rotate(-18deg);
+        }
+
+        .gold-border {
+            border: 1px solid rgba(212, 175, 55, 0.35);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141414;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #DC2626;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-tca-red selection:text-white">
+
+    <!-- Barre supérieure d'informations TCA -->
+    <div class="bg-black/80 border-b border-white/10 text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center space-x-4 text-gray-300">
+                <a href="tel:+21629664429" class="hover:text-tca-gold transition flex items-center gap-1.5">
+                    <i class="fas fa-phone-alt text-tca-red"></i> +216 29 664 429
+                </a>
+                <span class="hidden sm:inline text-gray-600">|</span>
+                <a href="mailto:t.careers.academy@gmail.com" class="hidden sm:flex hover:text-tca-gold transition items-center gap-1.5">
+                    <i class="fas fa-envelope text-tca-red"></i> t.careers.academy@gmail.com
+                </a>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Contrôle du son -->
+                <button id="soundToggleBtn" type="button" class="flex items-center gap-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full transition cursor-pointer" title="Activer/Désactiver le son">
+                    <i id="soundIcon" class="fas fa-volume-up text-tca-gold"></i>
+                    <span id="soundLabel" class="hidden sm:inline">Son activé</span>
+                </button>
+                <!-- Bouton Mode Admin -->
+                <button id="adminResetBtn" type="button" class="text-gray-400 hover:text-tca-gold bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full transition flex items-center gap-1.5 cursor-pointer" title="Réinitialiser l'essai pour tester à nouveau">
+                    <i class="fas fa-unlock-alt text-xs"></i>
+                    <span>Réinitialiser (Admin)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- En-tête Principal -->
+    <header class="pt-6 pb-4 px-4 sm:px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- Logo TCA -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 sm:w-14 sm:h-14 bg-tca-cream rounded-2xl flex items-center justify-center shadow-lg border-2 border-tca-gold/50 relative overflow-hidden">
+                    <svg viewBox="0 0 60 60" class="w-9 h-9">
+                        <path d="M12 14 H48 L45 23 H34 L28 48 H18 L24 23 H10 Z" fill="#141414" transform="translate(2, 2)" opacity="0.2"/>
+                        <path d="M12 14 H48 L45 23 H34 L28 48 H18 L24 23 H10 Z" fill="#DC2626"/>
+                        <circle cx="44" cy="42" r="4" fill="#D4AF37"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-extrabold tracking-wider text-white text-base sm:text-lg">TUNISIAN CAREERS</span>
+                        <span class="font-extrabold tracking-wider text-tca-red text-base sm:text-lg">ACADEMY</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-gray-400">Construisez votre avenir en Allemagne • De A1 à B2</p>
+                </div>
+            </div>
+
+            <!-- Badge Offre Spéciale Black Friday -->
+            <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-tca-redDark via-tca-red to-tca-redDark px-4 py-2 rounded-full shadow-lg border border-tca-gold/60 animate-float">
+                <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tca-gold opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tca-gold"></span>
+                </span>
+                <span class="text-xs sm:text-sm font-extrabold tracking-widest uppercase text-white">
+                    OFFRE SPÉCIALE BLACK FRIDAY
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu Principal -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        
+        <!-- Titre Accrocheur -->
+        <div class="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+            <p class="text-tca-gold font-semibold tracking-widest uppercase text-xs sm:text-sm mb-2">
+                ÉVÉNEMENT EXCLUSIF • PLACES LIMITÉES
+            </p>
+            <h1 class="font-serif text-3xl sm:text-5xl font-extrabold text-white leading-tight mb-3">
+                Tentez votre chance et gagnez jusqu’à <span class="text-transparent bg-clip-text bg-gradient-to-r from-tca-gold via-yellow-200 to-tca-gold">-20%</span> sur votre projet !
+            </h1>
+            <p class="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto">
+                Cours d'Allemand (A1 à B2), Consultation personnalisée ou Équivalence de diplôme : tournez la roue Black Friday et débloquez immédiatement votre remise exclusive TCA.
+            </p>
+        </div>
+
+        <!-- Grille Responsive : Roue à gauche / Formulaire à droite -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            
+            <!-- COLONNE GAUCHE : La Roue de la Fortune -->
+            <div class="lg:col-span-7 flex flex-col items-center justify-center relative">
+                
+                <!-- Conteneur de la Roue -->
+                <div class="relative w-full max-w-[330px] sm:max-w-[430px] md:max-w-[460px] aspect-square flex items-center justify-center mx-auto">
+                    
+                    <!-- Halo lumineux arrière -->
+                    <div class="absolute inset-4 rounded-full wheel-glow pointer-events-none"></div>
+
+                    <!-- Pointeur Doré en haut -->
+                    <div id="wheelPointer" class="wheel-pointer absolute -top-4 sm:-top-5 left-1/2 -translate-x-1/2 z-30 w-10 h-12 sm:w-12 sm:h-14 pointer-events-none">
+                        <svg viewBox="0 0 50 60" class="w-full h-full">
+                            <defs>
+                                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#FFF3B0"/>
+                                    <stop offset="50%" stop-color="#D4AF37"/>
+                                    <stop offset="100%" stop-color="#997A15"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M25 58 L6 16 A20 20 0 1 1 44 16 Z" fill="url(#goldGrad)" stroke="#141414" stroke-width="2.5"/>
+                            <circle cx="25" cy="18" r="6" fill="#141414"/>
+                            <circle cx="25" cy="18" r="3" fill="#DC2626"/>
+                        </svg>
+                    </div>
+
+                    <!-- Canvas de la Roue -->
+                    <div id="wheelWrapper" class="w-full h-full rounded-full p-2.5 sm:p-3 bg-gradient-to-b from-tca-gold via-yellow-600 to-tca-gold shadow-2xl relative">
+                        <canvas id="wheelCanvas" class="w-full h-full rounded-full block cursor-pointer"></canvas>
+                        
+                        <!-- Bouton Central "JOUER" -->
+                        <button id="centerSpinBtn" type="button" aria-label="Tourner la roue"
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-tca-red via-tca-redDark to-black border-4 border-tca-gold shadow-[0_0_25px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center text-white font-extrabold tracking-wider hover:scale-105 active:scale-95 transition-transform z-20 group cursor-pointer">
+                            <span class="text-xs sm:text-sm text-tca-gold group-hover:text-white transition">TCA</span>
+                            <span class="text-sm sm:text-base leading-none mt-0.5">JOUER</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Légende des services éligibles sous la roue -->
+                <div class="mt-6 flex flex-wrap justify-center gap-3 text-xs text-gray-400">
+                    <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                        <i class="fas fa-graduation-cap text-tca-red"></i> Cours A1-B2
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                        <i class="fas fa-file-certificate text-tca-gold"></i> Équivalence
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                        <i class="fas fa-comments text-emerald-400"></i> Consultation
+                    </span>
+                </div>
+            </div>
+
+            <!-- COLONNE DROITE : Formulaire d'inscription / État du joueur -->
+            <div class="lg:col-span-5">
+                <div class="bg-tca-card/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 gold-border shadow-2xl relative overflow-hidden">
+                    
+                    <!-- Ruban décoratif supérieur -->
+                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-tca-red via-tca-gold to-tca-red"></div>
+
+                    <!-- Notification interne (remplace alert()) -->
+                    <div id="inlineAlert" class="hidden mb-5 p-3.5 rounded-2xl text-sm flex items-start gap-2.5 transition-all">
+                        <i id="inlineAlertIcon" class="fas fa-info-circle mt-0.5"></i>
+                        <span id="inlineAlertText"></span>
+                    </div>
+
+                    <!-- Vue 1 : Formulaire avant de tourner -->
+                    <div id="formContainer">
+                        <div class="mb-6">
+                            <span class="inline-block text-xs font-bold uppercase tracking-wider text-tca-gold bg-tca-gold/10 px-3 py-1 rounded-full mb-2">
+                                Étape 1 sur 2
+                            </span>
+                            <h2 class="text-xl sm:text-2xl font-bold text-white">
+                                Débloquez votre tour gratuit
+                            </h2>
+                            <p class="text-gray-400 text-xs sm:text-sm mt-1">
+                                Renseignez vos coordonnées pour valider votre code promo Black Friday.
+                            </p>
+                        </div>
+
+                        <form id="playerForm" class="space-y-4" novalidate>
+                            <!-- Nom & Prénom -->
+                            <div>
+                                <label for="fullName" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5">
+                                    Nom & Prénom <span class="text-tca-red">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                                        <i class="fas fa-user"></i>
+                                    </span>
+                                    <input type="text" id="fullName" name="fullName" required placeholder="Ex: Ahmed Ben Ali"
+                                        class="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/15 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-tca-gold focus:ring-1 focus:ring-tca-gold transition">
+                                </div>
+                            </div>
+
+                            <!-- Numéro WhatsApp / Téléphone -->
+                            <div>
+                                <label for="whatsappPhone" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5">
+                                    Numéro WhatsApp / Téléphone <span class="text-tca-red">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-emerald-400">
+                                        <i class="fab fa-whatsapp text-base"></i>
+                                    </span>
+                                    <input type="tel" id="whatsappPhone" name="whatsappPhone" required placeholder="Ex: +216 20 123 456"
+                                        class="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/15 rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-tca-gold focus:ring-1 focus:ring-tca-gold transition">
+                                </div>
+                            </div>
+
+                            <!-- Service souhaité -->
+                            <div>
+                                <label for="desiredService" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-1.5">
+                                    Service souhaité <span class="text-tca-red">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-tca-gold">
+                                        <i class="fas fa-briefcase"></i>
+                                    </span>
+                                    <select id="desiredService" name="desiredService"
+                                        class="w-full pl-10 pr-10 py-3 bg-black/70 border border-white/15 rounded-xl text-white text-sm focus:outline-none focus:border-tca-gold focus:ring-1 focus:ring-tca-gold transition appearance-none cursor-pointer">
+                                        <option value="Cours d'Allemand A1–B2">Cours d'Allemand A1–B2</option>
+                                        <option value="Équivalence de diplôme">Équivalence de diplôme</option>
+                                        <option value="Consultation">Consultation</option>
+                                    </select>
+                                    <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-xs"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Bouton Principal de Lancement -->
+                            <button type="submit" id="submitSpinBtn"
+                                class="w-full mt-2 py-3.5 px-6 rounded-xl bg-gradient-to-r from-tca-red to-tca-redDark hover:from-red-500 hover:to-tca-red text-white font-bold text-sm sm:text-base shadow-lg shadow-tca-red/30 border border-white/10 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
+                                <i class="fas fa-dharmachakra"></i>
+                                <span>TOURNER LA ROUE BLACK FRIDAY</span>
+                            </button>
+                        </form>
+
+                        <!-- Bouton Mode Démo bien visible -->
+                        <div class="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
+                            <span>Tester sans remplir le formulaire :</span>
+                            <button type="button" id="demoSpinBtn"
+                                class="bg-tca-gold/15 hover:bg-tca-gold/25 text-tca-gold border border-tca-gold/40 px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition cursor-pointer">
+                                <i class="fas fa-play-circle"></i> Tourner en Mode Démo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vue 2 : Déjà joué -->
+                    <div id="alreadyPlayedContainer" class="hidden text-center py-4">
+                        <div class="w-16 h-16 rounded-full bg-tca-gold/15 border border-tca-gold/40 text-tca-gold flex items-center justify-center mx-auto mb-4 text-2xl">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span class="inline-block text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-full mb-2">
+                            Participation enregistrée
+                        </span>
+                        <h3 class="text-xl font-bold text-white mb-1">
+                            Vous avez déjà tourné la roue !
+                        </h3>
+                        <p class="text-gray-400 text-xs sm:text-sm mb-5">
+                            Voici le récapitulatif de votre gain Black Friday TCA :
+                        </p>
+
+                        <div class="bg-black/60 border border-tca-gold/30 rounded-2xl p-4 mb-5 text-left space-y-2">
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span>Participant :</span>
+                                <span id="savedPlayerName" class="text-white font-semibold"></span>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span>Remise gagnée :</span>
+                                <span id="savedPrizeLabel" class="text-tca-gold font-bold"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-gray-400 pt-2 border-t border-white/10">
+                                <span>Code Promo :</span>
+                                <span id="savedPromoCode" class="font-mono font-bold text-sm text-white bg-tca-red/20 border border-tca-red/40 px-2.5 py-0.5 rounded-lg"></span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <button type="button" id="reopenModalBtn"
+                                class="w-full py-3 px-4 rounded-xl bg-tca-gold hover:bg-yellow-500 text-tca-dark font-bold text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fas fa-gift"></i> Afficher mon bon & Réclamer
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="border-t border-white/10 py-5 px-4 text-center text-xs text-gray-400 bg-black/40">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <p>© 2026 <span class="text-white font-semibold">Tunisian Careers Academy</span>. Tous droits réservés.</p>
+            <p class="text-gray-500">Offre valable une seule fois par candidat pendant la semaine Black Friday.</p>
+        </div>
+    </footer>
+
+    <!-- MODALE DE VICTOIRE FESTIVE -->
+    <div id="winModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-opacity">
+        <div class="bg-tca-card border-2 border-tca-gold rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-[0_0_60px_rgba(212,175,55,0.35)] relative transform transition-all scale-95 opacity-0" id="winModalContent">
+            
+            <!-- Bouton fermer -->
+            <button id="closeModalBtn" type="button" aria-label="Fermer"
+                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Badge Victoire -->
+            <div class="text-center">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce">
+                    <i class="fas fa-crown"></i>
+                </div>
+
+                <span id="modalSubtitleBadge" class="inline-block text-xs font-extrabold uppercase tracking-widest text-tca-gold bg-tca-gold/15 px-3.5 py-1 rounded-full mb-2">
+                    FÉLICITATIONS !
+                </span>
+
+                <h3 class="font-serif text-2xl sm:text-3xl font-extrabold text-white mb-2">
+                    Vous avez gagné :
+                </h3>
+
+                <!-- Lot gagné en grand -->
+                <div class="my-4 p-4 rounded-2xl bg-gradient-to-r from-tca-redDark/90 via-tca-red to-tca-redDark/90 border border-tca-gold/60 shadow-inner">
+                    <p id="modalPrizeTitle" class="text-2xl sm:text-3xl font-black text-white leading-snug">
+                        -20% DE RÉDUCTION
+                    </p>
+                    <p id="modalPrizeDetail" class="text-xs sm:text-sm text-tca-goldLight mt-1 font-medium">
+                        Appliqué sur votre service : Cours d'Allemand A1–B2
+                    </p>
+                </div>
+
+                <!-- Code Promo Unique -->
+                <div class="mb-5">
+                    <p class="text-xs text-gray-400 uppercase tracking-wider mb-1.5 font-semibold">
+                        Votre code promo unique Black Friday
+                    </p>
+                    <div class="flex items-center justify-between bg-black/70 border border-dashed border-tca-gold rounded-xl p-2 pl-4">
+                        <span id="modalPromoCode" class="font-mono text-base sm:text-lg font-extrabold text-tca-gold tracking-wider select-all">
+                            TCA-BF20-8492
+                        </span>
+                        <button id="copyCodeBtn" type="button"
+                            class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition cursor-pointer">
+                            <i class="far fa-copy"></i>
+                            <span id="copyBtnText">Copier le code</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bouton WhatsApp Direct -->
+                <a id="whatsappClaimBtn" href="#" target="_blank" rel="noopener noreferrer"
+                    class="w-full py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5">
+                    <i class="fab fa-whatsapp text-xl"></i>
+                    <span>Réclamer mon offre sur WhatsApp</span>
+                </a>
+
+                <p class="text-[11px] text-gray-400 mt-3">
+                    Présentez ce code lors de votre échange avec notre équipe TCA (+216 29 664 429).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script complet et autonome -->
+    <script>
+        (function () {
+            // =========================================================================
+            // 1. CONFIGURATION DES 8 SEGMENTS (-5%, -10%, -15%, -20%) & POIDS
+            // =========================================================================
+            const SEGMENTS = [
+                {
+                    id: 'pct-5-a',
+                    percentage: '-5%',
+                    codePrefix: 'TCA-BF05',
+                    weight: 30,
+                    bgColor: '#FAF8F5', // Crème TCA
+                    textColor: '#141414'
+                },
+                {
+                    id: 'pct-10-a',
+                    percentage: '-10%',
+                    codePrefix: 'TCA-BF10',
+                    weight: 22,
+                    bgColor: '#1E1E1E', // Noir profond TCA
+                    textColor: '#FAF8F5'
+                },
+                {
+                    id: 'pct-15-a',
+                    percentage: '-15%',
+                    codePrefix: 'TCA-BF15',
+                    weight: 12,
+                    bgColor: '#DC2626', // Rouge signature TCA
+                    textColor: '#FFFFFF'
+                },
+                {
+                    id: 'pct-20-a',
+                    percentage: '-20%',
+                    codePrefix: 'TCA-BF20',
+                    weight: 4, // Offre majeure Or Black Friday
+                    bgColor: '#D4AF37',
+                    textColor: '#141414',
+                    isTopOffer: true
+                },
+                {
+                    id: 'pct-5-b',
+                    percentage: '-5%',
+                    codePrefix: 'TCA-BF05',
+                    weight: 30,
+                    bgColor: '#FAF8F5', // Crème TCA
+                    textColor: '#141414'
+                },
+                {
+                    id: 'pct-10-b',
+                    percentage: '-10%',
+                    codePrefix: 'TCA-BF10',
+                    weight: 22,
+                    bgColor: '#1E1E1E', // Noir profond TCA
+                    textColor: '#FAF8F5'
+                },
+                {
+                    id: 'pct-15-b',
+                    percentage: '-15%',
+                    codePrefix: 'TCA-BF15',
+                    weight: 12,
+                    bgColor: '#DC2626', // Rouge signature TCA
+                    textColor: '#FFFFFF'
+                },
+                {
+                    id: 'pct-20-b',
+                    percentage: '-20%',
+                    codePrefix: 'TCA-BF20',
+                    weight: 4, // Offre majeure Or Black Friday
+                    bgColor: '#D4AF37',
+                    textColor: '#141414',
+                    isTopOffer: true
+                }
+            ];
+
+            const STORAGE_KEY = 'tca_bf_wheel_state_v4';
+            const TCA_WHATSAPP_NUMBER = '21629664429';
+
+            // =========================================================================
+            // 2. STOCKAGE SÉCURISÉ (AVEC REPLI EN MÉMOIRE SI IFRAME SANDBOXÉE)
+            // =========================================================================
+            let memoryStorage = {};
+            const safeStorage = {
+                getItem(key) {
+                    try {
+                        return window.localStorage.getItem(key);
+                    } catch (e) {
+                        return memoryStorage[key] || null;
+                    }
+                },
+                setItem(key, value) {
+                    memoryStorage[key] = value;
+                    try {
+                        window.localStorage.setItem(key, value);
+                    } catch (e) {
+                        // Ignorer silencieusement si localStorage est bloqué par le navigateur
+                    }
+                },
+                removeItem(key) {
+                    delete memoryStorage[key];
+                    try {
+                        window.localStorage.removeItem(key);
+                    } catch (e) {
+                        // Ignorer silencieusement
+                    }
+                }
+            };
+
+            // =========================================================================
+            // 3. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
+            // =========================================================================
+            const canvas = document.getElementById('wheelCanvas');
+            const ctx = canvas.getContext('2d');
+            const wheelPointer = document.getElementById('wheelPointer');
+            const centerSpinBtn = document.getElementById('centerSpinBtn');
+            const playerForm = document.getElementById('playerForm');
+            const demoSpinBtn = document.getElementById('demoSpinBtn');
+            const adminResetBtn = document.getElementById('adminResetBtn');
+            const soundToggleBtn = document.getElementById('soundToggleBtn');
+            const soundIcon = document.getElementById('soundIcon');
+            const soundLabel = document.getElementById('soundLabel');
+
+            const formContainer = document.getElementById('formContainer');
+            const alreadyPlayedContainer = document.getElementById('alreadyPlayedContainer');
+            const savedPlayerName = document.getElementById('savedPlayerName');
+            const savedPrizeLabel = document.getElementById('savedPrizeLabel');
+            const savedPromoCode = document.getElementById('savedPromoCode');
+            const reopenModalBtn = document.getElementById('reopenModalBtn');
+
+            const inlineAlert = document.getElementById('inlineAlert');
+            const inlineAlertIcon = document.getElementById('inlineAlertIcon');
+            const inlineAlertText = document.getElementById('inlineAlertText');
+
+            const winModal = document.getElementById('winModal');
+            const winModalContent = document.getElementById('winModalContent');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalSubtitleBadge = document.getElementById('modalSubtitleBadge');
+            const modalPrizeTitle = document.getElementById('modalPrizeTitle');
+            const modalPrizeDetail = document.getElementById('modalPrizeDetail');
+            const modalPromoCode = document.getElementById('modalPromoCode');
+            const copyCodeBtn = document.getElementById('copyCodeBtn');
+            const copyBtnText = document.getElementById('copyBtnText');
+            const whatsappClaimBtn = document.getElementById('whatsappClaimBtn');
+
+            let currentRotation = 0; // En radians
+            let isSpinning = false;
+            let soundEnabled = true;
+            let audioCtx = null;
+            let lastTickIndex = -1;
+
+            // =========================================================================
+            // 4. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
+            // =========================================================================
+            function initAudio() {
+                try {
+                    if (!audioCtx) {
+                        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContextClass) {
+                            audioCtx = new AudioContextClass();
+                        }
+                    }
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                } catch (e) {
+                    // Audio non disponible
+                }
+            }
+
+            function playTickSound() {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(720, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.035);
+
+                    gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.04);
+                } catch (e) {}
+            }
+
+            function playWinFanfare() {
+                if (!soundEnabled) return;
+                try {
+                    initAudio();
+                    if (!audioCtx) return;
+                    const notes = [523.25, 659.25, 783.99, 1046.50]; // Do5, Mi5, Sol5, Do6
+                    notes.forEach((freq, idx) => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        const startTime = audioCtx.currentTime + idx * 0.11;
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, startTime);
+
+                        gain.gain.setValueAtTime(0.001, startTime);
+                        gain.gain.linearRampToValueAtTime(0.22, startTime + 0.03);
+                        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.45);
+
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.48);
+                    });
+                } catch (e) {}
+            }
+
+            // =========================================================================
+            // 5. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
+            // =========================================================================
+            function drawWheel() {
+                if (!canvas || !ctx) return;
+
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                const size = rect.width > 0 ? rect.width : 360;
+
+                canvas.width = size * dpr;
+                canvas.height = size * dpr;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.scale(dpr, dpr);
+
+                const centerX = size / 2;
+                const centerY = size / 2;
+                const radius = size / 2 - 4;
+                const numSegments = SEGMENTS.length;
+                const arcSize = (2 * Math.PI) / numSegments;
+
+                ctx.clearRect(0, 0, size, size);
+
+                // Dessiner chaque quartier
+                SEGMENTS.forEach((seg, i) => {
+                    const startAngle = currentRotation + i * arcSize;
+                    const endAngle = startAngle + arcSize;
+
+                    // Secteur coloré
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = seg.bgColor;
+                    ctx.fill();
+
+                    // Séparation dorée
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+                    ctx.stroke();
+
+                    // Texte : UNIQUEMENT le pourcentage en grand format
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate(startAngle + arcSize / 2);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = seg.textColor;
+
+                    const fontSize = Math.max(18, Math.round(size * 0.072));
+                    ctx.font = `900 ${fontSize}px Inter, sans-serif`;
+
+                    if (seg.isTopOffer) {
+                        ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
+                        ctx.shadowBlur = 6;
+                    } else if (seg.bgColor === '#1E1E1E' || seg.bgColor === '#DC2626') {
+                        ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                        ctx.shadowBlur = 4;
+                    }
+
+                    const textRadius = radius * 0.64;
+                    ctx.fillText(seg.percentage, textRadius, 1);
+                    ctx.restore();
+
+                    // Clou doré sur le bord extérieur
+                    const pinX = centerX + Math.cos(startAngle) * (radius - 9);
+                    const pinY = centerY + Math.sin(startAngle) * (radius - 9);
+                    ctx.beginPath();
+                    ctx.arc(pinX, pinY, 3.5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#D4AF37';
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = '#141414';
+                    ctx.stroke();
+                });
+
+                // Anneau intérieur décoratif autour du bouton central
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius * 0.25, 0, 2 * Math.PI);
+                ctx.fillStyle = '#141414';
+                ctx.fill();
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#D4AF37';
+                ctx.stroke();
+            }
+
+            // =========================================================================
+            // 6. TIRAGE PONDÉRÉ & CALCUL EXACT DE L'ANGLE SOUS LE POINTEUR DU HAUT
+            // =========================================================================
+            function pickWeightedSegmentIndex() {
+                const totalWeight = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
+                let random = Math.random() * totalWeight;
+                for (let i = 0; i < SEGMENTS.length; i++) {
+                    if (random < SEGMENTS[i].weight) {
+                        return i;
+                    }
+                    random -= SEGMENTS[i].weight;
+                }
+                return 0;
+            }
+
+            function getSegmentIndexUnderTopPointer(rotationRad) {
+                const numSegments = SEGMENTS.length;
+                const arcSize = (2 * Math.PI) / numSegments;
+                // Le pointeur supérieur est à -PI/2 (ou 3*PI/2) dans le repère Canvas
+                const pointerAngle = (3 * Math.PI) / 2;
+                const normalizedRot = ((rotationRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                const relativeAngle = ((pointerAngle - normalizedRot) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                return Math.floor(relativeAngle / arcSize) % numSegments;
+            }
+
+            function triggerWheelSpin({ fullName, whatsappPhone, desiredService, isDemo }) {
+                if (isSpinning) return;
+                hideInlineAlert();
+                initAudio();
+
+                isSpinning = true;
+                centerSpinBtn.disabled = true;
+
+                const winningIndex = pickWeightedSegmentIndex();
+                const numSegments = SEGMENTS.length;
+                const arcSize = (2 * Math.PI) / numSegments;
+
+                // Centre du segment gagnant dans le repère de la roue
+                const segmentCenterAngle = winningIndex * arcSize + arcSize / 2;
+                // Léger décalage aléatoire naturel à l'intérieur du segment (±30%)
+                const jitter = (Math.random() - 0.5) * (arcSize * 0.6);
+                const pointerAngle = (3 * Math.PI) / 2;
+
+                // Angle cible normalisé pour que le segment gagnant s'arrête pile sous le pointeur en haut
+                const targetNormalized = ((pointerAngle - (segmentCenterAngle + jitter)) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                let deltaAngle = targetNormalized - currentNormalized;
+                if (deltaAngle <= 0) deltaAngle += 2 * Math.PI;
+
+                // 6 à 8 tours complets avant l'arrêt
+                const extraSpins = (6 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
+                const totalRotationDelta = extraSpins + deltaAngle;
+
+                const startRotation = currentRotation;
+                const targetRotation = startRotation + totalRotationDelta;
+                const durationMs = 4600;
+                const startTime = performance.now();
+
+                // Courbe d'accélération puis décélération fluide (easeOutQuart)
+                function easeOutQuart(t) {
+                    return 1 - Math.pow(1 - t, 4);
+                }
+
+                function animateFrame(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / durationMs, 1);
+                    const eased = easeOutQuart(progress);
+
+                    currentRotation = startRotation + totalRotationDelta * eased;
+                    drawWheel();
+
+                    // Détection du passage d'un segment sous le pointeur pour le clic sonore et l'animation
+                    const activeIdx = getSegmentIndexUnderTopPointer(currentRotation);
+                    if (activeIdx !== lastTickIndex) {
+                        lastTickIndex = activeIdx;
+                        playTickSound();
+                        wheelPointer.classList.add('tick');
+                        setTimeout(() => wheelPointer.classList.remove('tick'), 65);
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animateFrame);
+                    } else {
+                        currentRotation = targetRotation;
+                        drawWheel();
+                        isSpinning = false;
+                        centerSpinBtn.disabled = false;
+
+                        const actualWinningIndex = getSegmentIndexUnderTopPointer(currentRotation);
+                        const winningSegment = SEGMENTS[actualWinningIndex];
+                        onSpinComplete({
+                            fullName,
+                            whatsappPhone,
+                            desiredService,
+                            winningSegment,
+                            isDemo
+                        });
+                    }
+                }
+
+                requestAnimationFrame(animateFrame);
+            }
+
+            // =========================================================================
+            // 7. GESTION DE FIN DE TOUR, CODE PROMO, CONFETTIS & WHATSAPP
+            // =========================================================================
+            function generatePromoCode(prefix) {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                let suffix = '';
+                for (let i = 0; i < 4; i++) {
+                    suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return `${prefix}-${suffix}`;
+            }
+
+            function launchConfetti() {
+                if (typeof confetti !== 'function') return;
+                try {
+                    confetti({
+                        particleCount: 85,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#DC2626', '#D4AF37', '#FAF8F5', '#FDE047']
+                    });
+                } catch (e) {}
+            }
+
+            function onSpinComplete({ fullName, whatsappPhone, desiredService, winningSegment, isDemo }) {
+                playWinFanfare();
+                launchConfetti();
+
+                const promoCode = isDemo
+                    ? `${winningSegment.codePrefix}-DEMO`
+                    : generatePromoCode(winningSegment.codePrefix);
+
+                const resultData = {
+                    fullName: isDemo ? 'Visiteur Démo' : fullName,
+                    whatsappPhone: isDemo ? '' : whatsappPhone,
+                    desiredService: desiredService,
+                    percentageWon: winningSegment.percentage,
+                    promoCode: promoCode,
+                    isDemo: isDemo
+                };
+
+                if (!isDemo) {
+                    safeStorage.setItem(STORAGE_KEY, JSON.stringify(resultData));
+                    syncUIWithSavedState();
+                }
+
+                openWinModal(resultData);
+            }
+
+            function openWinModal(data) {
+                modalSubtitleBadge.textContent = data.isDemo
+                    ? 'MODE DÉMO • APERÇU DU GAIN'
+                    : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`;
+
+                modalPrizeTitle.textContent = `${data.percentageWon} DE RÉDUCTION`;
+                modalPrizeDetail.textContent = `Appliqué sur votre service : ${data.desiredService}`;
+                modalPromoCode.textContent = data.promoCode;
+                copyBtnText.textContent = 'Copier le code';
+
+                const messageLines = [
+                    `Bonjour Tunisian Careers Academy ! 🎓🇩🇪`,
+                    `Je viens de participer à la *Roue Black Friday TCA* !`,
+                    ``,
+                    `👤 *Nom :* ${data.fullName}`,
+                    `🎁 *Remise gagnée :* ${data.percentageWon}`,
+                    `📌 *Service choisi :* ${data.desiredService}`,
+                    `🎟️ *Code Promo :* ${data.promoCode}`,
+                    ``,
+                    `Je souhaite réclamer mon offre Black Friday dès maintenant !`
+                ];
+                const encodedMessage = encodeURIComponent(messageLines.join('\n'));
+                whatsappClaimBtn.href = `https://wa.me/${TCA_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+                winModal.classList.remove('hidden');
+                winModal.classList.add('flex');
+                requestAnimationFrame(() => {
+                    winModalContent.classList.remove('scale-95', 'opacity-0');
+                    winModalContent.classList.add('scale-100', 'opacity-100');
+                });
+            }
+
+            function closeWinModal() {
+                winModalContent.classList.remove('scale-100', 'opacity-100');
+                winModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    winModal.classList.add('hidden');
+                    winModal.classList.remove('flex');
+                }, 200);
+            }
+
+            // =========================================================================
+            // 8. ÉTAT DU JOUEUR & MESSAGES INTERNES
+            // =========================================================================
+            function getSavedState() {
+                try {
+                    const raw = safeStorage.getItem(STORAGE_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function syncUIWithSavedState() {
+                const saved = getSavedState();
+                if (saved) {
+                    formContainer.classList.add('hidden');
+                    alreadyPlayedContainer.classList.remove('hidden');
+                    savedPlayerName.textContent = saved.fullName;
+                    savedPrizeLabel.textContent = `${saved.percentageWon} (${saved.desiredService})`;
+                    savedPromoCode.textContent = saved.promoCode;
+                } else {
+                    formContainer.classList.remove('hidden');
+                    alreadyPlayedContainer.classList.add('hidden');
+                }
+            }
+
+            function showInlineAlert(message, type = 'warning') {
+                inlineAlert.classList.remove('hidden', 'bg-red-500/15', 'border-red-500/40', 'text-red-200', 'bg-emerald-500/15', 'border-emerald-500/40', 'text-emerald-200');
+                inlineAlert.classList.add('border');
+                if (type === 'success') {
+                    inlineAlert.classList.add('bg-emerald-500/15', 'border-emerald-500/40', 'text-emerald-200');
+                    inlineAlertIcon.className = 'fas fa-check-circle mt-0.5 text-emerald-400';
+                } else {
+                    inlineAlert.classList.add('bg-red-500/15', 'border-red-500/40', 'text-red-200');
+                    inlineAlertIcon.className = 'fas fa-exclamation-triangle mt-0.5 text-tca-red';
+                }
+                inlineAlertText.textContent = message;
+            }
+
+            function hideInlineAlert() {
+                inlineAlert.classList.add('hidden');
+            }
+
+            // =========================================================================
+            // 9. ÉCOUTEURS D'ÉVÉNEMENTS
+            // =========================================================================
+            function handleValidatedFormSpin() {
+                const saved = getSavedState();
+                if (saved) {
+                    openWinModal(saved);
+                    return;
+                }
+
+                const fullName = document.getElementById('fullName').value.trim();
+                const whatsappPhone = document.getElementById('whatsappPhone').value.trim();
+                const desiredService = document.getElementById('desiredService').value;
+
+                if (!fullName || fullName.length < 2) {
+                    showInlineAlert('Veuillez renseigner votre Nom et Prénom pour tourner la roue.', 'warning');
+                    document.getElementById('fullName').focus();
+                    return;
+                }
+
+                if (!whatsappPhone || whatsappPhone.replace(/\D/g, '').length < 8) {
+                    showInlineAlert('Veuillez saisir un numéro WhatsApp ou téléphone valide (ex: +216 20 123 456).', 'warning');
+                    document.getElementById('whatsappPhone').focus();
+                    return;
+                }
+
+                triggerWheelSpin({
+                    fullName,
+                    whatsappPhone,
+                    desiredService,
+                    isDemo: false
+                });
+            }
+
+            playerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleValidatedFormSpin();
+            });
+
+            centerSpinBtn.addEventListener('click', () => {
+                handleValidatedFormSpin();
+            });
+
+            canvas.addEventListener('click', () => {
+                handleValidatedFormSpin();
+            });
+
+            demoSpinBtn.addEventListener('click', () => {
+                const desiredService = document.getElementById('desiredService').value;
+                triggerWheelSpin({
+                    fullName: 'Visiteur Démo',
+                    whatsappPhone: '',
+                    desiredService,
+                    isDemo: true
+                });
+            });
+
+            adminResetBtn.addEventListener('click', () => {
+                if (isSpinning) return;
+                safeStorage.removeItem(STORAGE_KEY);
+                syncUIWithSavedState();
+                showInlineAlert('Session réinitialisée (Mode Admin) : vous pouvez relancer un essai.', 'success');
+            });
+
+            reopenModalBtn.addEventListener('click', () => {
+                const saved = getSavedState();
+                if (saved) openWinModal(saved);
+            });
+
+            closeModalBtn.addEventListener('click', closeWinModal);
+            winModal.addEventListener('click', (e) => {
+                if (e.target === winModal) closeWinModal();
+            });
+
+            copyCodeBtn.addEventListener('click', () => {
+                const code = modalPromoCode.textContent.trim();
+                const tempInput = document.createElement('input');
+                tempInput.value = code;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtnText.textContent = 'Copié !';
+                    setTimeout(() => {
+                        copyBtnText.textContent = 'Copier le code';
+                    }, 2200);
+                } catch (e) {}
+                document.body.removeChild(tempInput);
+            });
+
+            soundToggleBtn.addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                if (soundEnabled) {
+                    soundIcon.className = 'fas fa-volume-up text-tca-gold';
+                    soundLabel.textContent = 'Son activé';
+                } else {
+                    soundIcon.className = 'fas fa-volume-mute text-gray-500';
+                    soundLabel.textContent = 'Son coupé';
+                }
+            });
+
+            // =========================================================================
+            // 10. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
+            // =========================================================================
+            window.addEventListener('resize', drawWheel);
+            syncUIWithSavedState();
+            drawWheel();
+            // Redessiner après le chargement complet des polices pour un rendu net
+            if (document.fonts && document.fonts.ready) {
+                document.fonts.ready.then(drawWheel);
+            }
+        })();
+    </script>
+</body>
+</html>
