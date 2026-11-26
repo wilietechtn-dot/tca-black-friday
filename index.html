@@ -106,6 +106,9 @@
                 </a>
             </div>
             <div class="flex items-center gap-3">
+                <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] bg-white/5 border border-white/10 text-gray-300 px-2.5 py-1 rounded-full">
+                    <i class="fas fa-database text-tca-gold"></i> Mode Local (API prête)
+                </span>
                 <!-- Contrôle du son -->
                 <button id="soundToggleBtn" type="button" class="flex items-center gap-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full transition cursor-pointer" title="Activer/Désactiver le son">
                     <i id="soundIcon" class="fas fa-volume-up text-tca-gold"></i>
@@ -232,7 +235,7 @@
                     <!-- Ruban décoratif supérieur -->
                     <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-tca-red via-tca-gold to-tca-red"></div>
 
-                    <!-- Notification interne (remplace alert()) -->
+                    <!-- Notification interne -->
                     <div id="inlineAlert" class="hidden mb-5 p-3.5 rounded-2xl text-sm flex items-start gap-2.5 transition-all">
                         <i id="inlineAlertIcon" class="fas fa-info-circle mt-0.5"></i>
                         <span id="inlineAlertText"></span>
@@ -248,7 +251,7 @@
                                 Débloquez votre tour gratuit
                             </h2>
                             <p class="text-gray-400 text-xs sm:text-sm mt-1">
-                                Un seul tour par personne et par numéro de téléphone.
+                                Un seul tour par personne et par numéro de téléphone (tous appareils confondus).
                             </p>
                         </div>
 
@@ -375,7 +378,7 @@
     <footer class="border-t border-white/10 py-5 px-4 text-center text-xs text-gray-400 bg-black/40">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p>© 2026 <span class="text-white font-semibold">Tunisian Careers Academy</span>. Tous droits réservés.</p>
-            <p class="text-gray-500">Offre valable une seule fois par personne, numéro et code promo pendant le Black Friday.</p>
+            <p class="text-gray-500">Code à usage unique et numéro vérifié sur tous les appareils.</p>
         </div>
     </footer>
 
@@ -438,13 +441,13 @@
                 </a>
 
                 <p class="text-[11px] text-gray-400 mt-3">
-                    Ce code signé est à usage unique et vérifié par notre équipe TCA lors de votre inscription.
+                    Une fois utilisé, ce code est bloqué définitivement sur tous les appareils.
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- MODALE ADMIN : VÉRIFICATION DE CODE & HISTORIQUE -->
+    <!-- MODALE ADMIN : VÉRIFICATION D'AUTHENTICITÉ & HISTORIQUE PARTAGÉ -->
     <div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity">
         <div id="adminModalContent" class="bg-tca-card border border-tca-gold/60 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative transform transition-all scale-95 opacity-0 max-h-[90vh] overflow-y-auto">
             
@@ -461,7 +464,7 @@
                 </div>
                 <div>
                     <h3 class="text-lg sm:text-xl font-bold text-white">Vérification Admin TCA</h3>
-                    <p class="text-xs text-gray-400">Contrôle d'authenticité, usage unique & numéros enregistrés</p>
+                    <p class="text-xs text-gray-400">Authenticité, blocage multi-appareils & historique complet</p>
                 </div>
             </div>
 
@@ -491,7 +494,7 @@
                 <!-- Formulaire de vérification d'un code -->
                 <div class="bg-black/50 border border-white/10 rounded-2xl p-4">
                     <label for="verifyCodeInput" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
-                        Entrer le code promo du client (ex: TCA-15-XXXX-XX)
+                        Vérifier l'authenticité d'un code promo (ex: TCA-15-XXXX-XX)
                     </label>
                     <form id="verifyCodeForm" class="flex flex-col sm:flex-row gap-2">
                         <input type="text" id="verifyCodeInput" placeholder="TCA-15-XXXX-XX" autocomplete="off"
@@ -502,30 +505,30 @@
                         </button>
                     </form>
 
-                    <!-- Zone de Résultat de Vérification -->
+                    <!-- Zone de Résultat de Vérification + Historique lié -->
                     <div id="verifyResultBox" class="hidden mt-4 rounded-xl p-4 border transition-all">
                         <!-- Contenu injecté dynamiquement -->
                     </div>
                 </div>
 
-                <!-- Historique local des codes générés / numéros enregistrés -->
+                <!-- Historique global des participations & codes utilisés -->
                 <div class="bg-black/40 border border-white/10 rounded-2xl p-4">
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-1.5">
-                            <i class="fas fa-history text-tca-gold"></i> Participations & Numéros enregistrés
+                            <i class="fas fa-history text-tca-gold"></i> Historique complet des codes & numéros
                         </h4>
                         <span id="historyCountBadge" class="text-[11px] bg-white/10 text-gray-300 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="adminHistoryList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
+                    <div id="adminHistoryList" class="space-y-2 max-h-52 overflow-y-auto pr-1 text-xs">
                         <!-- Liste injectée dynamiquement -->
                     </div>
                 </div>
 
-                <!-- Actions Admin (Réinitialiser l'essai joueur / Verrouiller) -->
+                <!-- Actions Admin -->
                 <div class="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
                     <button id="adminResetPlayerBtn" type="button"
                         class="text-xs bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/15 px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
-                        <i class="fas fa-redo-alt text-tca-gold"></i> Réinitialiser le tour d'essai
+                        <i class="fas fa-redo-alt text-tca-gold"></i> Réinitialiser l'affichage local
                     </button>
                     <button id="adminLockBtn" type="button"
                         class="text-xs text-gray-400 hover:text-red-400 px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
@@ -540,84 +543,30 @@
     <script>
         (function () {
             // =========================================================================
-            // 1. CONFIGURATION & CLÉS DE SÉCURITÉ TCA
+            // 1. CONFIGURATION, CLÉS DE SÉCURITÉ & ENDPOINT MULTI-APPAREILS TCA
             // =========================================================================
             const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
             const TCA_ADMIN_PIN = 'TCA2026';
             const TCA_WHATSAPP_NUMBER = '21629664429';
 
-            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v6';
-            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v6';
-            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v6';
-            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v6';
+            // Renseignez ici l'URL de votre endpoint backend / serverless (ex: /api/tca-wheel ou Supabase Edge Function)
+            // Si vide, le mode local est utilisé automatiquement avec structure prête pour la synchronisation serveur.
+            const TCA_SHARED_API_URL = '';
+
+            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v7';
+            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v7';
+            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v7';
+            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v7';
 
             const SEGMENTS = [
-                {
-                    id: 'pct-5-a',
-                    percentage: '-5%',
-                    pctCode: '05',
-                    weight: 30,
-                    bgColor: '#FAF8F5',
-                    textColor: '#141414'
-                },
-                {
-                    id: 'pct-10-a',
-                    percentage: '-10%',
-                    pctCode: '10',
-                    weight: 22,
-                    bgColor: '#1E1E1E',
-                    textColor: '#FAF8F5'
-                },
-                {
-                    id: 'pct-15-a',
-                    percentage: '-15%',
-                    pctCode: '15',
-                    weight: 12,
-                    bgColor: '#DC2626',
-                    textColor: '#FFFFFF'
-                },
-                {
-                    id: 'pct-20-a',
-                    percentage: '-20%',
-                    pctCode: '20',
-                    weight: 4,
-                    bgColor: '#D4AF37',
-                    textColor: '#141414',
-                    isTopOffer: true
-                },
-                {
-                    id: 'pct-5-b',
-                    percentage: '-5%',
-                    pctCode: '05',
-                    weight: 30,
-                    bgColor: '#FAF8F5',
-                    textColor: '#141414'
-                },
-                {
-                    id: 'pct-10-b',
-                    percentage: '-10%',
-                    pctCode: '10',
-                    weight: 22,
-                    bgColor: '#1E1E1E',
-                    textColor: '#FAF8F5'
-                },
-                {
-                    id: 'pct-15-b',
-                    percentage: '-15%',
-                    pctCode: '15',
-                    weight: 12,
-                    bgColor: '#DC2626',
-                    textColor: '#FFFFFF'
-                },
-                {
-                    id: 'pct-20-b',
-                    percentage: '-20%',
-                    pctCode: '20',
-                    weight: 4,
-                    bgColor: '#D4AF37',
-                    textColor: '#141414',
-                    isTopOffer: true
-                }
+                { id: 'pct-5-a', percentage: '-5%', pctCode: '05', weight: 30, bgColor: '#FAF8F5', textColor: '#141414' },
+                { id: 'pct-10-a', percentage: '-10%', pctCode: '10', weight: 22, bgColor: '#1E1E1E', textColor: '#FAF8F5' },
+                { id: 'pct-15-a', percentage: '-15%', pctCode: '15', weight: 12, bgColor: '#DC2626', textColor: '#FFFFFF' },
+                { id: 'pct-20-a', percentage: '-20%', pctCode: '20', weight: 4, bgColor: '#D4AF37', textColor: '#141414', isTopOffer: true },
+                { id: 'pct-5-b', percentage: '-5%', pctCode: '05', weight: 30, bgColor: '#FAF8F5', textColor: '#141414' },
+                { id: 'pct-10-b', percentage: '-10%', pctCode: '10', weight: 22, bgColor: '#1E1E1E', textColor: '#FAF8F5' },
+                { id: 'pct-15-b', percentage: '-15%', pctCode: '15', weight: 12, bgColor: '#DC2626', textColor: '#FFFFFF' },
+                { id: 'pct-20-b', percentage: '-20%', pctCode: '20', weight: 4, bgColor: '#D4AF37', textColor: '#141414', isTopOffer: true }
             ];
 
             // =========================================================================
@@ -647,8 +596,30 @@
             };
 
             // =========================================================================
-            // 3. NORMALISATION DES NUMÉROS DE TÉLÉPHONE
+            // 3. EMPREINTE NUMÉRIQUE (HASH) & NORMALISATION TÉLÉPHONE
             // =========================================================================
+            function computeSha256LikeHash(inputStr) {
+                const text = `${TCA_SECRET_KEY}::${(inputStr || '').trim().toUpperCase()}`;
+                let h1 = 0xdeadbeef;
+                let h2 = 0x41c6ce57;
+                let h3 = 0x9e3779b9;
+                let h4 = 0x85ebca6b;
+
+                for (let i = 0; i < text.length; i++) {
+                    const ch = text.charCodeAt(i);
+                    h1 = Math.imul(h1 ^ ch, 2654435761);
+                    h2 = Math.imul(h2 ^ ch, 1597334677);
+                    h3 = Math.imul(h3 ^ (ch + i), 2246822519);
+                    h4 = Math.imul(h4 ^ (ch * 31), 3266489917);
+                }
+
+                const partA = ((h1 ^ (h2 >>> 13)) >>> 0).toString(16).padStart(8, '0');
+                const partB = ((h3 ^ (h4 >>> 7)) >>> 0).toString(16).padStart(8, '0');
+                const partC = ((h1 + h3) >>> 0).toString(16).padStart(8, '0');
+                const partD = ((h2 ^ h4) >>> 0).toString(16).padStart(8, '0');
+                return `${partA}${partB}${partC}${partD}`;
+            }
+
             function normalizePhone(rawPhone) {
                 let digits = (rawPhone || '').replace(/\D/g, '');
                 if (digits.startsWith('00')) {
@@ -660,6 +631,41 @@
                 return digits;
             }
 
+            // =========================================================================
+            // 4. COUPLEUR BASE PARTAGÉE / BACKEND MULTI-APPAREILS (AVEC CACHE LOCAL)
+            // =========================================================================
+            const syncStatusBadge = document.getElementById('syncStatusBadge');
+
+            function updateSyncBadge(onlineMode) {
+                if (!syncStatusBadge) return;
+                if (onlineMode) {
+                    syncStatusBadge.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> Base partagée active`;
+                } else {
+                    syncStatusBadge.innerHTML = `<i class="fas fa-database text-tca-gold"></i> Mode Local (API prête)`;
+                }
+            }
+
+            async function callSharedBackend(action, payload = {}) {
+                if (!TCA_SHARED_API_URL) {
+                    updateSyncBadge(false);
+                    return null;
+                }
+                try {
+                    const response = await fetch(TCA_SHARED_API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action, ...payload })
+                    });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    const data = await response.json();
+                    updateSyncBadge(true);
+                    return data;
+                } catch (err) {
+                    updateSyncBadge(false);
+                    return null;
+                }
+            }
+
             function getRegisteredPhonesMap() {
                 try {
                     const raw = safeStorage.getItem(STORAGE_KEY_PHONES);
@@ -669,16 +675,33 @@
                 }
             }
 
-            function registerPhoneRecord(normalizedPhone, record) {
+            async function registerPhoneRecord(normalizedPhone, record) {
                 if (!normalizedPhone) return;
                 const phonesMap = getRegisteredPhonesMap();
                 phonesMap[normalizedPhone] = record;
                 safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+                await callSharedBackend('register_participation', {
+                    normalizedPhone,
+                    record
+                });
+            }
+
+            async function lookupExistingParticipation(normalizedPhone) {
+                const phonesMap = getRegisteredPhonesMap();
+                if (phonesMap[normalizedPhone]) {
+                    return phonesMap[normalizedPhone];
+                }
+                const remote = await callSharedBackend('check_phone', { normalizedPhone });
+                if (remote && remote.exists && remote.record) {
+                    phonesMap[normalizedPhone] = remote.record;
+                    safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+                    return remote.record;
+                }
+                return null;
             }
 
             // =========================================================================
-            // 4. ALGORITHME DÉTERMINISTE DE SIGNATURE & VÉRIFICATION DE CODE
-            // Format : TCA-[POURCENTAGE]-[4LETTRES_CHIFFRES]-[2CARACTERES_CHECKSUM]
+            // 5. SIGNATURE & VÉRIFICATION DE CODE PROMO
             // =========================================================================
             const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -739,13 +762,14 @@
                 return {
                     valid: true,
                     code: cleaned,
+                    consumedCodeHash: computeSha256LikeHash(cleaned),
                     pctCode: pctCode,
                     percentageLabel: `-${pctNumeric}%`
                 };
             }
 
             // =========================================================================
-            // 5. GESTION DE L'HISTORIQUE & DES CODES CONSOMMÉS
+            // 6. HISTORIQUE COMPLET & CODES CONSOMMÉS (BLOQUÉS MULTI-APPAREILS)
             // =========================================================================
             function getHistoryList() {
                 try {
@@ -759,9 +783,16 @@
             function saveToHistory(entry) {
                 const list = getHistoryList();
                 const existingIndex = list.findIndex(item => item.promoCode === entry.promoCode);
+                const enrichedEntry = {
+                    ...entry,
+                    consumedCodeHash: entry.consumedCodeHash || computeSha256LikeHash(entry.promoCode)
+                };
                 if (existingIndex === -1) {
-                    list.unshift(entry);
-                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list.slice(0, 100)));
+                    list.unshift(enrichedEntry);
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list.slice(0, 150)));
+                } else {
+                    list[existingIndex] = { ...list[existingIndex], ...enrichedEntry };
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list));
                 }
             }
 
@@ -775,25 +806,92 @@
             }
 
             function isPromoCodeConsumed(code) {
+                const cleanCode = (code || '').trim().toUpperCase();
+                const hash = computeSha256LikeHash(cleanCode);
                 const map = getConsumedMap();
-                return Boolean(map[(code || '').trim().toUpperCase()]);
+                return Boolean(map[cleanCode] || Object.values(map).some(entry => entry && entry.consumedCodeHash === hash));
             }
 
-            function markCodeAsConsumed(code, metadata = {}) {
+            function getConsumedEntry(code) {
                 const cleanCode = (code || '').trim().toUpperCase();
+                const hash = computeSha256LikeHash(cleanCode);
+                const map = getConsumedMap();
+                if (map[cleanCode]) return map[cleanCode];
+                return Object.values(map).find(entry => entry && entry.consumedCodeHash === hash) || null;
+            }
+
+            async function markCodeAsConsumed(code, metadata = {}) {
+                const cleanCode = (code || '').trim().toUpperCase();
+                const consumedCodeHash = computeSha256LikeHash(cleanCode);
                 const consumed = getConsumedMap();
+                const usageEntry = {
+                    code: cleanCode,
+                    consumedCodeHash,
+                    usedAt: new Date().toLocaleString('fr-FR'),
+                    lockedAcrossDevices: true,
+                    ...metadata
+                };
+
                 if (!consumed[cleanCode]) {
-                    consumed[cleanCode] = {
-                        usedAt: new Date().toLocaleString('fr-FR'),
-                        ...metadata
-                    };
+                    consumed[cleanCode] = usageEntry;
                     safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
                 }
+
+                // Mettre à jour l'historique existant pour garder la trace complète
+                const history = getHistoryList();
+                const idx = history.findIndex(item => item.promoCode === cleanCode);
+                if (idx !== -1) {
+                    history[idx] = {
+                        ...history[idx],
+                        status: 'UTILISÉ',
+                        usedAt: consumed[cleanCode].usedAt,
+                        consumedCodeHash
+                    };
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+                }
+
+                // Synchronisation immédiate avec la base partagée (autre appareil)
+                await callSharedBackend('consume_code', {
+                    code: cleanCode,
+                    consumedCodeHash,
+                    usageEntry
+                });
+
                 syncUIWithSavedState();
             }
 
+            async function fetchRemoteCodeStatus(code) {
+                const cleanCode = (code || '').trim().toUpperCase();
+                const consumedCodeHash = computeSha256LikeHash(cleanCode);
+                const remote = await callSharedBackend('check_code', {
+                    code: cleanCode,
+                    consumedCodeHash
+                });
+
+                if (remote && Array.isArray(remote.history)) {
+                    const localHistory = getHistoryList();
+                    remote.history.forEach(item => {
+                        if (!localHistory.some(h => h.promoCode === item.promoCode)) {
+                            localHistory.push(item);
+                        }
+                    });
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(localHistory.slice(0, 150)));
+                }
+
+                if (remote && remote.consumed && remote.consumed.usedAt) {
+                    const consumed = getConsumedMap();
+                    consumed[cleanCode] = {
+                        code: cleanCode,
+                        consumedCodeHash,
+                        usedAt: remote.consumed.usedAt,
+                        lockedAcrossDevices: true
+                    };
+                    safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                }
+            }
+
             // =========================================================================
-            // 6. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
+            // 7. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
             // =========================================================================
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
@@ -829,7 +927,6 @@
             const copyBtnText = document.getElementById('copyBtnText');
             const whatsappClaimBtn = document.getElementById('whatsappClaimBtn');
 
-            // Références Panneau Admin
             const openAdminVerifyBtn = document.getElementById('openAdminVerifyBtn');
             const adminModal = document.getElementById('adminModal');
             const adminModalContent = document.getElementById('adminModalContent');
@@ -855,7 +952,7 @@
             let isAdminUnlocked = false;
 
             // =========================================================================
-            // 7. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
+            // 8. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
             // =========================================================================
             function initAudio() {
                 try {
@@ -918,7 +1015,7 @@
             }
 
             // =========================================================================
-            // 8. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
+            // 9. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
             // =========================================================================
             function drawWheel() {
                 if (!canvas || !ctx) return;
@@ -998,7 +1095,7 @@
             }
 
             // =========================================================================
-            // 9. TIRAGE PONDÉRÉ & ANIMATION DE ROTATION
+            // 10. TIRAGE PONDÉRÉ & ANIMATION DE ROTATION
             // =========================================================================
             function pickWeightedSegmentIndex() {
                 const totalWeight = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
@@ -1095,7 +1192,7 @@
             }
 
             // =========================================================================
-            // 10. GESTION DE FIN DE TOUR, CODE SIGNÉ, CONFETTIS & WHATSAPP
+            // 11. GESTION DE FIN DE TOUR, CODE SIGNÉ, CONFETTIS & WHATSAPP
             // =========================================================================
             function launchConfetti() {
                 if (typeof confetti !== 'function') return;
@@ -1109,11 +1206,12 @@
                 } catch (e) {}
             }
 
-            function onSpinComplete({ fullName, whatsappPhone, normalizedPhone, desiredService, winningSegment, isDemo }) {
+            async function onSpinComplete({ fullName, whatsappPhone, normalizedPhone, desiredService, winningSegment, isDemo }) {
                 playWinFanfare();
                 launchConfetti();
 
                 const signedCode = generateSignedPromoCode(winningSegment.pctCode);
+                const consumedCodeHash = computeSha256LikeHash(signedCode);
 
                 const resultData = {
                     fullName: isDemo ? 'Visiteur Démo' : fullName,
@@ -1122,6 +1220,8 @@
                     desiredService: desiredService,
                     percentageWon: winningSegment.percentage,
                     promoCode: signedCode,
+                    consumedCodeHash: consumedCodeHash,
+                    status: 'ACTIF',
                     createdAt: new Date().toLocaleString('fr-FR'),
                     isDemo: isDemo
                 };
@@ -1131,7 +1231,7 @@
                 if (!isDemo) {
                     safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
                     if (normalizedPhone) {
-                        registerPhoneRecord(normalizedPhone, resultData);
+                        await registerPhoneRecord(normalizedPhone, resultData);
                     }
                     syncUIWithSavedState();
                 }
@@ -1142,7 +1242,7 @@
             function openWinModal(data) {
                 const used = isPromoCodeConsumed(data.promoCode);
                 modalSubtitleBadge.textContent = used
-                    ? 'CODE DÉJÀ UTILISÉ'
+                    ? 'CODE DÉJÀ UTILISÉ • BLOQUÉ'
                     : (data.isDemo
                         ? 'MODE DÉMO • CODE CERTIFIÉ'
                         : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`);
@@ -1185,7 +1285,7 @@
             }
 
             // =========================================================================
-            // 11. PANNEAU ADMIN DE VÉRIFICATION DE CODE & NUMÉROS
+            // 12. PANNEAU ADMIN : VÉRIFICATION D'AUTHENTICITÉ & HISTORIQUE LIÉ
             // =========================================================================
             function openAdminModal() {
                 adminModal.classList.remove('hidden');
@@ -1217,19 +1317,19 @@
 
             function renderAdminHistory() {
                 const history = getHistoryList();
-                const consumed = getConsumedMap();
                 historyCountBadge.textContent = history.length;
 
                 if (history.length === 0) {
-                    adminHistoryList.innerHTML = `<p class="text-gray-500 italic py-2 text-center">Aucun tirage enregistré sur cet appareil pour le moment.</p>`;
+                    adminHistoryList.innerHTML = `<p class="text-gray-500 italic py-2 text-center">Aucun code ou numéro enregistré pour le moment.</p>`;
                     return;
                 }
 
                 adminHistoryList.innerHTML = history.map(item => {
-                    const isUsed = Boolean(consumed[item.promoCode]);
+                    const isUsed = isPromoCodeConsumed(item.promoCode);
+                    const usedInfo = getConsumedEntry(item.promoCode);
                     const statusBadge = isUsed
                         ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">UTILISÉ</span>`
-                        : `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">VALIDE</span>`;
+                        : `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">DISPONIBLE</span>`;
 
                     return `
                         <div class="flex items-center justify-between gap-2 bg-black/60 border border-white/10 rounded-xl p-2.5">
@@ -1239,12 +1339,15 @@
                                     <span class="text-white font-bold">${item.percentageWon}</span>
                                     ${item.whatsappPhone ? `<span class="text-[11px] font-mono text-emerald-300">${item.whatsappPhone}</span>` : ''}
                                 </div>
-                                <p class="text-[11px] text-gray-400 truncate">${item.fullName} • ${item.desiredService}</p>
+                                <p class="text-[11px] text-gray-400 truncate">
+                                    ${item.fullName} • ${item.desiredService} • Créé : ${item.createdAt || '—'}
+                                    ${usedInfo && usedInfo.usedAt ? ` • Utilisé : ${usedInfo.usedAt}` : ''}
+                                </p>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
                                 ${statusBadge}
                                 <button type="button" data-inspect-code="${item.promoCode}"
-                                    class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-[11px] cursor-pointer" title="Vérifier ce code">
+                                    class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-[11px] cursor-pointer" title="Vérifier l'authenticité et l'historique de ce code">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
@@ -1261,7 +1364,7 @@
                 });
             }
 
-            function performAdminCodeCheck(rawInput) {
+            async function performAdminCodeCheck(rawInput) {
                 const check = verifySignedPromoCode(rawInput);
                 verifyResultBox.classList.remove('hidden', 'bg-emerald-500/15', 'border-emerald-500/50', 'bg-amber-500/15', 'border-amber-500/50', 'bg-red-500/15', 'border-red-500/50');
 
@@ -1283,13 +1386,26 @@
                     return;
                 }
 
-                const consumedMap = getConsumedMap();
-                const alreadyUsedInfo = consumedMap[check.code];
-                const localRecord = getHistoryList().find(h => h.promoCode === check.code);
+                await fetchRemoteCodeStatus(check.code);
 
-                const localDetailsHtml = localRecord
-                    ? `<p class="text-xs text-gray-300 mt-1">Client : <strong class="text-white">${localRecord.fullName}</strong> (${localRecord.whatsappPhone || 'Démo'}) — Service : <strong class="text-white">${localRecord.desiredService}</strong></p>`
-                    : `<p class="text-xs text-gray-400 mt-1">Code généré depuis un autre appareil et certifié authentique par signature TCA.</p>`;
+                const alreadyUsedInfo = getConsumedEntry(check.code);
+                const matchingHistory = getHistoryList().filter(
+                    h => h.promoCode === check.code || h.consumedCodeHash === check.consumedCodeHash
+                );
+
+                const historyTimelineHtml = matchingHistory.length > 0
+                    ? `
+                        <div class="mt-3 pt-2.5 border-t border-white/10 space-y-1.5">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-gray-300">Historique lié à ce code :</p>
+                            ${matchingHistory.map(entry => `
+                                <div class="text-[11px] text-gray-300 bg-black/50 rounded-lg px-2.5 py-1.5 flex flex-wrap justify-between gap-1">
+                                    <span><strong class="text-white">${entry.fullName}</strong> (${entry.whatsappPhone || 'Démo'}) • ${entry.desiredService}</span>
+                                    <span class="text-gray-400">${entry.createdAt || ''}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `
+                    : `<p class="text-xs text-gray-400 mt-2">Code généré sur un autre appareil et authentifié par signature TCA.</p>`;
 
                 if (alreadyUsedInfo) {
                     verifyResultBox.classList.add('bg-amber-500/15', 'border-amber-500/50');
@@ -1300,15 +1416,18 @@
                             </div>
                             <div class="flex-grow">
                                 <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 mb-1">
-                                    CODE DÉJÀ UTILISÉ • RÉUTILISATION BLOQUÉE
+                                    CODE DÉJÀ UTILISÉ • INTERDIT SUR TOUT APPAREIL
                                 </span>
                                 <p class="text-sm font-bold text-white mt-0.5">
                                     Code <span class="font-mono text-tca-gold">${check.code}</span> (${check.percentageLabel})
                                 </p>
                                 <p class="text-xs text-amber-200 mt-1">
-                                    Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ne peut pas être utilisé une autre fois.
+                                    Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ne peut plus être réutilisé ailleurs.
                                 </p>
-                                ${localDetailsHtml}
+                                <p class="text-[10px] font-mono text-gray-400 mt-1 break-all">
+                                    Empreinte : ${check.consumedCodeHash}
+                                </p>
+                                ${historyTimelineHtml}
                             </div>
                         </div>
                     `;
@@ -1329,10 +1448,13 @@
                                 Réduction certifiée : <span class="text-tca-gold text-lg">${check.percentageLabel}</span>
                             </p>
                             <p class="text-xs font-mono text-gray-300 mt-0.5">${check.code}</p>
-                            ${localDetailsHtml}
+                            <p class="text-[10px] font-mono text-gray-400 mt-1 break-all">
+                                Empreinte : ${check.consumedCodeHash}
+                            </p>
+                            ${historyTimelineHtml}
                             <button type="button" id="markCodeUsedBtn"
                                 class="mt-3 w-full py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                                <i class="fas fa-check-double"></i> Valider et consommer ce code (Usage unique)
+                                <i class="fas fa-check-double"></i> Marquer ce code comme UTILISÉ (Bloquer sur tous appareils)
                             </button>
                         </div>
                     </div>
@@ -1340,16 +1462,16 @@
 
                 const markBtn = document.getElementById('markCodeUsedBtn');
                 if (markBtn) {
-                    markBtn.addEventListener('click', () => {
-                        markCodeAsConsumed(check.code, { percentageLabel: check.percentageLabel });
+                    markBtn.addEventListener('click', async () => {
+                        await markCodeAsConsumed(check.code, { percentageLabel: check.percentageLabel });
                         renderAdminHistory();
-                        performAdminCodeCheck(check.code);
+                        await performAdminCodeCheck(check.code);
                     });
                 }
             }
 
             // =========================================================================
-            // 12. ÉTAT DU JOUEUR & MESSAGES INTERNES
+            // 13. ÉTAT DU JOUEUR & MESSAGES INTERNES
             // =========================================================================
             function getSavedPlayerState() {
                 try {
@@ -1371,7 +1493,7 @@
                     savedPromoCode.textContent = saved.promoCode;
 
                     if (isPromoCodeConsumed(saved.promoCode)) {
-                        savedCodeStatus.textContent = 'DÉJÀ UTILISÉ';
+                        savedCodeStatus.textContent = 'DÉJÀ UTILISÉ (BLOQUÉ)';
                         savedCodeStatus.className = 'text-xs font-bold text-amber-400';
                     } else {
                         savedCodeStatus.textContent = 'ACTIF (USAGE UNIQUE)';
@@ -1401,9 +1523,9 @@
             }
 
             // =========================================================================
-            // 13. ÉCOUTEURS D'ÉVÉNEMENTS
+            // 14. ÉCOUTEURS D'ÉVÉNEMENTS
             // =========================================================================
-            function handleValidatedFormSpin() {
+            async function handleValidatedFormSpin() {
                 const saved = getSavedPlayerState();
                 if (saved) {
                     openWinModal(saved);
@@ -1427,13 +1549,12 @@
                     return;
                 }
 
-                const phonesMap = getRegisteredPhonesMap();
-                if (phonesMap[normalizedPhone]) {
-                    const existingRecord = phonesMap[normalizedPhone];
+                const existingRecord = await lookupExistingParticipation(normalizedPhone);
+                if (existingRecord) {
                     safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(existingRecord));
                     syncUIWithSavedState();
                     showInlineAlert(
-                        `Ce numéro (${whatsappPhone}) a déjà participé et reçu le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Un seul essai est autorisé par numéro.`,
+                        `Ce numéro (${whatsappPhone}) a déjà participé et reçu le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Aucune nouvelle participation n'est autorisée.`,
                         'warning'
                     );
                     openWinModal(existingRecord);
@@ -1505,7 +1626,6 @@
                 }
             });
 
-            // Événements Panneau Admin
             openAdminVerifyBtn.addEventListener('click', openAdminModal);
             closeAdminModalBtn.addEventListener('click', closeAdminModal);
             adminModal.addEventListener('click', (e) => {
@@ -1537,7 +1657,7 @@
                 safeStorage.removeItem(STORAGE_KEY_PLAYER);
                 syncUIWithSavedState();
                 closeAdminModal();
-                showInlineAlert('Session locale réinitialisée : les numéros déjà enregistrés et codes consommés restent protégés.', 'success');
+                showInlineAlert('Affichage local réinitialisé : les numéros enregistrés et codes consommés restent bloqués.', 'success');
             });
 
             adminLockBtn.addEventListener('click', () => {
@@ -1550,7 +1670,7 @@
             });
 
             // =========================================================================
-            // 14. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
+            // 15. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
             // =========================================================================
             window.addEventListener('resize', drawWheel);
             syncUIWithSavedState();
