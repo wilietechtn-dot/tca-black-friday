@@ -248,7 +248,7 @@
                                 Débloquez votre tour gratuit
                             </h2>
                             <p class="text-gray-400 text-xs sm:text-sm mt-1">
-                                Renseignez vos coordonnées pour valider votre code promo Black Friday.
+                                Un seul tour par personne et par numéro de téléphone.
                             </p>
                         </div>
 
@@ -312,7 +312,7 @@
 
                         <!-- Bouton Mode Démo bien visible -->
                         <div class="mt-5 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
-                            <span>Tester sans remplir le formulaire :</span>
+                            <span>Tester sans enregistrer de numéro :</span>
                             <button type="button" id="demoSpinBtn"
                                 class="bg-tca-gold/15 hover:bg-tca-gold/25 text-tca-gold border border-tca-gold/40 px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition cursor-pointer">
                                 <i class="fas fa-play-circle"></i> Tourner en Mode Démo
@@ -341,12 +341,20 @@
                                 <span id="savedPlayerName" class="text-white font-semibold"></span>
                             </div>
                             <div class="flex justify-between text-xs text-gray-400">
+                                <span>Téléphone :</span>
+                                <span id="savedPlayerPhone" class="text-white font-mono"></span>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-400">
                                 <span>Remise gagnée :</span>
                                 <span id="savedPrizeLabel" class="text-tca-gold font-bold"></span>
                             </div>
                             <div class="flex justify-between items-center text-xs text-gray-400 pt-2 border-t border-white/10">
                                 <span>Code Promo Signé :</span>
                                 <span id="savedPromoCode" class="font-mono font-bold text-sm text-white bg-tca-red/20 border border-tca-red/40 px-2.5 py-0.5 rounded-lg"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-gray-400">
+                                <span>Statut du code :</span>
+                                <span id="savedCodeStatus" class="text-xs font-bold"></span>
                             </div>
                         </div>
 
@@ -367,7 +375,7 @@
     <footer class="border-t border-white/10 py-5 px-4 text-center text-xs text-gray-400 bg-black/40">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p>© 2026 <span class="text-white font-semibold">Tunisian Careers Academy</span>. Tous droits réservés.</p>
-            <p class="text-gray-500">Offre valable une seule fois par candidat pendant la semaine Black Friday.</p>
+            <p class="text-gray-500">Offre valable une seule fois par personne, numéro et code promo pendant le Black Friday.</p>
         </div>
     </footer>
 
@@ -408,7 +416,7 @@
                 <!-- Code Promo Unique Signé -->
                 <div class="mb-5">
                     <p class="text-xs text-gray-400 uppercase tracking-wider mb-1.5 font-semibold">
-                        Votre code promo certifié Black Friday
+                        Votre code promo certifié Black Friday (usage unique)
                     </p>
                     <div class="flex items-center justify-between bg-black/70 border border-dashed border-tca-gold rounded-xl p-2 pl-4">
                         <span id="modalPromoCode" class="font-mono text-base sm:text-lg font-extrabold text-tca-gold tracking-wider select-all">
@@ -430,7 +438,7 @@
                 </a>
 
                 <p class="text-[11px] text-gray-400 mt-3">
-                    Ce code signé est vérifié par notre équipe TCA lors de votre inscription.
+                    Ce code signé est à usage unique et vérifié par notre équipe TCA lors de votre inscription.
                 </p>
             </div>
         </div>
@@ -453,7 +461,7 @@
                 </div>
                 <div>
                     <h3 class="text-lg sm:text-xl font-bold text-white">Vérification Admin TCA</h3>
-                    <p class="text-xs text-gray-400">Contrôle d'authenticité mathématique des codes Black Friday</p>
+                    <p class="text-xs text-gray-400">Contrôle d'authenticité, usage unique & numéros enregistrés</p>
                 </div>
             </div>
 
@@ -474,7 +482,6 @@
                     <p id="adminAuthError" class="hidden text-xs text-red-400 mt-2 flex items-center gap-1.5">
                         <i class="fas fa-exclamation-circle"></i> Mot de passe incorrect.
                     </p>
-                   
                 </div>
             </div>
 
@@ -491,7 +498,7 @@
                             class="flex-grow px-3.5 py-2.5 bg-black/80 border border-white/15 rounded-xl text-white font-mono uppercase text-sm focus:outline-none focus:border-tca-gold">
                         <button type="submit"
                             class="px-4 py-2.5 rounded-xl bg-tca-red hover:bg-tca-redDark text-white font-bold text-sm transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
-                            <i class="fas fa-search"></i> Vérifier l'authenticité
+                            <i class="fas fa-search"></i> Vérifier
                         </button>
                     </form>
 
@@ -501,15 +508,15 @@
                     </div>
                 </div>
 
-                <!-- Historique local des codes générés / vérifiés -->
+                <!-- Historique local des codes générés / numéros enregistrés -->
                 <div class="bg-black/40 border border-white/10 rounded-2xl p-4">
                     <div class="flex items-center justify-between mb-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-1.5">
-                            <i class="fas fa-history text-tca-gold"></i> Historique sur cet appareil
+                            <i class="fas fa-history text-tca-gold"></i> Participations & Numéros enregistrés
                         </h4>
                         <span id="historyCountBadge" class="text-[11px] bg-white/10 text-gray-300 px-2 py-0.5 rounded-full">0</span>
                     </div>
-                    <div id="adminHistoryList" class="space-y-2 max-h-44 overflow-y-auto pr-1 text-xs">
+                    <div id="adminHistoryList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
                         <!-- Liste injectée dynamiquement -->
                     </div>
                 </div>
@@ -538,11 +545,11 @@
             const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
             const TCA_ADMIN_PIN = 'TCA2026';
             const TCA_WHATSAPP_NUMBER = '21629664429';
-            const ALLOWED_PERCENTAGES = ['05', '10', '15', '20'];
 
-            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v5';
-            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v5';
-            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v5';
+            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v6';
+            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v6';
+            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v6';
+            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v6';
 
             const SEGMENTS = [
                 {
@@ -640,9 +647,38 @@
             };
 
             // =========================================================================
-            // 3. ALGORITHME DÉTERMINISTE DE SIGNATURE & VÉRIFICATION DE CODE
+            // 3. NORMALISATION DES NUMÉROS DE TÉLÉPHONE
+            // =========================================================================
+            function normalizePhone(rawPhone) {
+                let digits = (rawPhone || '').replace(/\D/g, '');
+                if (digits.startsWith('00')) {
+                    digits = digits.slice(2);
+                }
+                if (digits.length === 8) {
+                    digits = '216' + digits;
+                }
+                return digits;
+            }
+
+            function getRegisteredPhonesMap() {
+                try {
+                    const raw = safeStorage.getItem(STORAGE_KEY_PHONES);
+                    return raw ? JSON.parse(raw) : {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            function registerPhoneRecord(normalizedPhone, record) {
+                if (!normalizedPhone) return;
+                const phonesMap = getRegisteredPhonesMap();
+                phonesMap[normalizedPhone] = record;
+                safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+            }
+
+            // =========================================================================
+            // 4. ALGORITHME DÉTERMINISTE DE SIGNATURE & VÉRIFICATION DE CODE
             // Format : TCA-[POURCENTAGE]-[4LETTRES_CHIFFRES]-[2CARACTERES_CHECKSUM]
-            // Exemple : TCA-15-X8K2-7M
             // =========================================================================
             const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -709,7 +745,7 @@
             }
 
             // =========================================================================
-            // 4. GESTION DE L'HISTORIQUE & DES CODES CONSOMMÉS
+            // 5. GESTION DE L'HISTORIQUE & DES CODES CONSOMMÉS
             // =========================================================================
             function getHistoryList() {
                 try {
@@ -725,7 +761,7 @@
                 const existingIndex = list.findIndex(item => item.promoCode === entry.promoCode);
                 if (existingIndex === -1) {
                     list.unshift(entry);
-                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list.slice(0, 50)));
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list.slice(0, 100)));
                 }
             }
 
@@ -738,17 +774,26 @@
                 }
             }
 
+            function isPromoCodeConsumed(code) {
+                const map = getConsumedMap();
+                return Boolean(map[(code || '').trim().toUpperCase()]);
+            }
+
             function markCodeAsConsumed(code, metadata = {}) {
+                const cleanCode = (code || '').trim().toUpperCase();
                 const consumed = getConsumedMap();
-                consumed[code] = {
-                    usedAt: new Date().toLocaleString('fr-FR'),
-                    ...metadata
-                };
-                safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                if (!consumed[cleanCode]) {
+                    consumed[cleanCode] = {
+                        usedAt: new Date().toLocaleString('fr-FR'),
+                        ...metadata
+                    };
+                    safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                }
+                syncUIWithSavedState();
             }
 
             // =========================================================================
-            // 5. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
+            // 6. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
             // =========================================================================
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
@@ -763,8 +808,10 @@
             const formContainer = document.getElementById('formContainer');
             const alreadyPlayedContainer = document.getElementById('alreadyPlayedContainer');
             const savedPlayerName = document.getElementById('savedPlayerName');
+            const savedPlayerPhone = document.getElementById('savedPlayerPhone');
             const savedPrizeLabel = document.getElementById('savedPrizeLabel');
             const savedPromoCode = document.getElementById('savedPromoCode');
+            const savedCodeStatus = document.getElementById('savedCodeStatus');
             const reopenModalBtn = document.getElementById('reopenModalBtn');
 
             const inlineAlert = document.getElementById('inlineAlert');
@@ -808,7 +855,7 @@
             let isAdminUnlocked = false;
 
             // =========================================================================
-            // 6. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
+            // 7. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
             // =========================================================================
             function initAudio() {
                 try {
@@ -871,7 +918,7 @@
             }
 
             // =========================================================================
-            // 7. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
+            // 8. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
             // =========================================================================
             function drawWheel() {
                 if (!canvas || !ctx) return;
@@ -951,7 +998,7 @@
             }
 
             // =========================================================================
-            // 8. TIRAGE PONDÉRÉ & ANIMATION DE ROTATION
+            // 9. TIRAGE PONDÉRÉ & ANIMATION DE ROTATION
             // =========================================================================
             function pickWeightedSegmentIndex() {
                 const totalWeight = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
@@ -974,7 +1021,7 @@
                 return Math.floor(relativeAngle / arcSize) % numSegments;
             }
 
-            function triggerWheelSpin({ fullName, whatsappPhone, desiredService, isDemo }) {
+            function triggerWheelSpin({ fullName, whatsappPhone, normalizedPhone, desiredService, isDemo }) {
                 if (isSpinning) return;
                 hideInlineAlert();
                 initAudio();
@@ -1036,6 +1083,7 @@
                         onSpinComplete({
                             fullName,
                             whatsappPhone,
+                            normalizedPhone,
                             desiredService,
                             winningSegment,
                             isDemo
@@ -1047,7 +1095,7 @@
             }
 
             // =========================================================================
-            // 9. GESTION DE FIN DE TOUR, CODE SIGNÉ, CONFETTIS & WHATSAPP
+            // 10. GESTION DE FIN DE TOUR, CODE SIGNÉ, CONFETTIS & WHATSAPP
             // =========================================================================
             function launchConfetti() {
                 if (typeof confetti !== 'function') return;
@@ -1061,16 +1109,16 @@
                 } catch (e) {}
             }
 
-            function onSpinComplete({ fullName, whatsappPhone, desiredService, winningSegment, isDemo }) {
+            function onSpinComplete({ fullName, whatsappPhone, normalizedPhone, desiredService, winningSegment, isDemo }) {
                 playWinFanfare();
                 launchConfetti();
 
-                // Générer un code signé mathématiquement (même en mode démo, il est authentifiable !)
                 const signedCode = generateSignedPromoCode(winningSegment.pctCode);
 
                 const resultData = {
                     fullName: isDemo ? 'Visiteur Démo' : fullName,
                     whatsappPhone: isDemo ? '' : whatsappPhone,
+                    normalizedPhone: isDemo ? '' : normalizedPhone,
                     desiredService: desiredService,
                     percentageWon: winningSegment.percentage,
                     promoCode: signedCode,
@@ -1082,6 +1130,9 @@
 
                 if (!isDemo) {
                     safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
+                    if (normalizedPhone) {
+                        registerPhoneRecord(normalizedPhone, resultData);
+                    }
                     syncUIWithSavedState();
                 }
 
@@ -1089,9 +1140,12 @@
             }
 
             function openWinModal(data) {
-                modalSubtitleBadge.textContent = data.isDemo
-                    ? 'MODE DÉMO • CODE CERTIFIÉ'
-                    : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`;
+                const used = isPromoCodeConsumed(data.promoCode);
+                modalSubtitleBadge.textContent = used
+                    ? 'CODE DÉJÀ UTILISÉ'
+                    : (data.isDemo
+                        ? 'MODE DÉMO • CODE CERTIFIÉ'
+                        : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`);
 
                 modalPrizeTitle.textContent = `${data.percentageWon} DE RÉDUCTION`;
                 modalPrizeDetail.textContent = `Appliqué sur votre service : ${data.desiredService}`;
@@ -1103,12 +1157,13 @@
                     `Je viens de participer à la *Roue Black Friday TCA* !`,
                     ``,
                     `👤 *Nom :* ${data.fullName}`,
+                    data.whatsappPhone ? `📱 *Téléphone :* ${data.whatsappPhone}` : ``,
                     `🎁 *Remise gagnée :* ${data.percentageWon}`,
                     `📌 *Service choisi :* ${data.desiredService}`,
                     `🎟️ *Code Promo Certifié :* ${data.promoCode}`,
                     ``,
                     `Je souhaite réclamer mon offre Black Friday dès maintenant !`
-                ];
+                ].filter(line => line !== '');
                 const encodedMessage = encodeURIComponent(messageLines.join('\n'));
                 whatsappClaimBtn.href = `https://wa.me/${TCA_WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
@@ -1130,7 +1185,7 @@
             }
 
             // =========================================================================
-            // 10. PANNEAU ADMIN DE VÉRIFICATION DE CODE
+            // 11. PANNEAU ADMIN DE VÉRIFICATION DE CODE & NUMÉROS
             // =========================================================================
             function openAdminModal() {
                 adminModal.classList.remove('hidden');
@@ -1179,9 +1234,10 @@
                     return `
                         <div class="flex items-center justify-between gap-2 bg-black/60 border border-white/10 rounded-xl p-2.5">
                             <div class="min-w-0">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <span class="font-mono font-bold text-tca-gold">${item.promoCode}</span>
                                     <span class="text-white font-bold">${item.percentageWon}</span>
+                                    ${item.whatsappPhone ? `<span class="text-[11px] font-mono text-emerald-300">${item.whatsappPhone}</span>` : ''}
                                 </div>
                                 <p class="text-[11px] text-gray-400 truncate">${item.fullName} • ${item.desiredService}</p>
                             </div>
@@ -1233,24 +1289,24 @@
 
                 const localDetailsHtml = localRecord
                     ? `<p class="text-xs text-gray-300 mt-1">Client : <strong class="text-white">${localRecord.fullName}</strong> (${localRecord.whatsappPhone || 'Démo'}) — Service : <strong class="text-white">${localRecord.desiredService}</strong></p>`
-                    : `<p class="text-xs text-gray-400 mt-1">Code généré depuis un autre appareil (ex: téléphone du client) et certifié authentique par signature TCA.</p>`;
+                    : `<p class="text-xs text-gray-400 mt-1">Code généré depuis un autre appareil et certifié authentique par signature TCA.</p>`;
 
                 if (alreadyUsedInfo) {
                     verifyResultBox.classList.add('bg-amber-500/15', 'border-amber-500/50');
                     verifyResultBox.innerHTML = `
                         <div class="flex items-start gap-3">
                             <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-lg">
-                                <i class="fas fa-exclamation-triangle"></i>
+                                <i class="fas fa-ban"></i>
                             </div>
                             <div class="flex-grow">
                                 <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 mb-1">
-                                    CODE DÉJÀ UTILISÉ
+                                    CODE DÉJÀ UTILISÉ • RÉUTILISATION BLOQUÉE
                                 </span>
                                 <p class="text-sm font-bold text-white mt-0.5">
                                     Code <span class="font-mono text-tca-gold">${check.code}</span> (${check.percentageLabel})
                                 </p>
                                 <p class="text-xs text-amber-200 mt-1">
-                                    Consommé le : <strong>${alreadyUsedInfo.usedAt}</strong>
+                                    Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ne peut pas être utilisé une autre fois.
                                 </p>
                                 ${localDetailsHtml}
                             </div>
@@ -1259,7 +1315,6 @@
                     return;
                 }
 
-                // Code authentique & non encore utilisé
                 verifyResultBox.classList.add('bg-emerald-500/15', 'border-emerald-500/50');
                 verifyResultBox.innerHTML = `
                     <div class="flex items-start gap-3">
@@ -1268,7 +1323,7 @@
                         </div>
                         <div class="flex-grow">
                             <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 mb-1">
-                                CODE AUTHENTIQUE & VALIDE
+                                CODE AUTHENTIQUE & DISPONIBLE
                             </span>
                             <p class="text-base font-extrabold text-white mt-0.5">
                                 Réduction certifiée : <span class="text-tca-gold text-lg">${check.percentageLabel}</span>
@@ -1277,7 +1332,7 @@
                             ${localDetailsHtml}
                             <button type="button" id="markCodeUsedBtn"
                                 class="mt-3 w-full py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                                <i class="fas fa-check-double"></i> Marquer ce code comme UTILISÉ
+                                <i class="fas fa-check-double"></i> Valider et consommer ce code (Usage unique)
                             </button>
                         </div>
                     </div>
@@ -1294,7 +1349,7 @@
             }
 
             // =========================================================================
-            // 11. ÉTAT DU JOUEUR & MESSAGES INTERNES
+            // 12. ÉTAT DU JOUEUR & MESSAGES INTERNES
             // =========================================================================
             function getSavedPlayerState() {
                 try {
@@ -1311,8 +1366,17 @@
                     formContainer.classList.add('hidden');
                     alreadyPlayedContainer.classList.remove('hidden');
                     savedPlayerName.textContent = saved.fullName;
+                    savedPlayerPhone.textContent = saved.whatsappPhone || 'Non renseigné';
                     savedPrizeLabel.textContent = `${saved.percentageWon} (${saved.desiredService})`;
                     savedPromoCode.textContent = saved.promoCode;
+
+                    if (isPromoCodeConsumed(saved.promoCode)) {
+                        savedCodeStatus.textContent = 'DÉJÀ UTILISÉ';
+                        savedCodeStatus.className = 'text-xs font-bold text-amber-400';
+                    } else {
+                        savedCodeStatus.textContent = 'ACTIF (USAGE UNIQUE)';
+                        savedCodeStatus.className = 'text-xs font-bold text-emerald-400';
+                    }
                 } else {
                     formContainer.classList.remove('hidden');
                     alreadyPlayedContainer.classList.add('hidden');
@@ -1337,7 +1401,7 @@
             }
 
             // =========================================================================
-            // 12. ÉCOUTEURS D'ÉVÉNEMENTS
+            // 13. ÉCOUTEURS D'ÉVÉNEMENTS
             // =========================================================================
             function handleValidatedFormSpin() {
                 const saved = getSavedPlayerState();
@@ -1356,15 +1420,30 @@
                     return;
                 }
 
-                if (!whatsappPhone || whatsappPhone.replace(/\D/g, '').length < 8) {
+                const normalizedPhone = normalizePhone(whatsappPhone);
+                if (!whatsappPhone || normalizedPhone.length < 8) {
                     showInlineAlert('Veuillez saisir un numéro WhatsApp ou téléphone valide (ex: +216 20 123 456).', 'warning');
                     document.getElementById('whatsappPhone').focus();
+                    return;
+                }
+
+                const phonesMap = getRegisteredPhonesMap();
+                if (phonesMap[normalizedPhone]) {
+                    const existingRecord = phonesMap[normalizedPhone];
+                    safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(existingRecord));
+                    syncUIWithSavedState();
+                    showInlineAlert(
+                        `Ce numéro (${whatsappPhone}) a déjà participé et reçu le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Un seul essai est autorisé par numéro.`,
+                        'warning'
+                    );
+                    openWinModal(existingRecord);
                     return;
                 }
 
                 triggerWheelSpin({
                     fullName,
                     whatsappPhone,
+                    normalizedPhone,
                     desiredService,
                     isDemo: false
                 });
@@ -1383,6 +1462,7 @@
                 triggerWheelSpin({
                     fullName: 'Visiteur Démo',
                     whatsappPhone: '',
+                    normalizedPhone: '',
                     desiredService,
                     isDemo: true
                 });
@@ -1457,7 +1537,7 @@
                 safeStorage.removeItem(STORAGE_KEY_PLAYER);
                 syncUIWithSavedState();
                 closeAdminModal();
-                showInlineAlert('Session joueur réinitialisée : un nouvel essai est disponible.', 'success');
+                showInlineAlert('Session locale réinitialisée : les numéros déjà enregistrés et codes consommés restent protégés.', 'success');
             });
 
             adminLockBtn.addEventListener('click', () => {
@@ -1470,7 +1550,7 @@
             });
 
             // =========================================================================
-            // 13. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
+            // 14. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
             // =========================================================================
             window.addEventListener('resize', drawWheel);
             syncUIWithSavedState();
