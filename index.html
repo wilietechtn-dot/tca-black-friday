@@ -563,17 +563,17 @@
             // 1. CONFIGURATION SUPABASE & CLÉS DE SÉCURITÉ TCA
             // =========================================================================
             const SUPABASE_URL = 'https://dywaiutdvzccqlvcysww.supabase.co';
-            const SUPABASE_PUBLISHABLE_KEY = 'COLLEZ_VOTRE_CLE_PUBLISHABLE_ICI';
+            const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_79sFGWw1-mLDRrjtWZDxUg_8RQ4f...';
             const SUPABASE_TABLE = 'tca_wheel_participations';
 
             const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
             const TCA_ADMIN_PIN = 'TCA2026';
             const TCA_WHATSAPP_NUMBER = '21629664429';
 
-            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v8';
-            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v8';
-            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v8';
-            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v8';
+            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v9';
+            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v9';
+            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v9';
+            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v9';
 
             const SEGMENTS = [
                 { id: 'pct-5-a', percentage: '-5%', pctCode: '05', weight: 30, bgColor: '#FAF8F5', textColor: '#141414' },
@@ -690,12 +690,15 @@
             }
 
             async function registerPhoneRecord(normalizedPhone, record) {
-                if (!normalizedPhone) return;
+                if (!normalizedPhone) return { ok: false };
                 const phonesMap = getRegisteredPhonesMap();
                 phonesMap[normalizedPhone] = record;
                 safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
 
-                if (!isSupabaseConfigured()) return;
+                if (!isSupabaseConfigured()) {
+                    return { ok: true, offline: true };
+                }
+
                 try {
                     const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
                         method: 'POST',
@@ -711,9 +714,23 @@
                             status: 'ACTIF'
                         })
                     });
-                    if (res.ok) updateSyncBadge(true);
+
+                    if (res.ok) {
+                        updateSyncBadge(true);
+                        const inserted = await res.json();
+                        return { ok: true, record: inserted[0] ? mapSupabaseRowToRecord(inserted[0]) : record };
+                    }
+
+                    // Conflit d'unicité (409) : le numéro ou code existe déjà en base
+                    if (res.status === 409) {
+                        const existing = await lookupExistingParticipation(normalizedPhone);
+                        return { ok: false, duplicate: true, existing };
+                    }
+
+                    return { ok: false };
                 } catch (err) {
                     updateSyncBadge(false);
+                    return { ok: false };
                 }
             }
 
@@ -730,6 +747,7 @@
                                 const phonesMap = getRegisteredPhonesMap();
                                 phonesMap[normalizedPhone] = rec;
                                 safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+
                                 if (rec.status === 'UTILISÉ') {
                                     const consumed = getConsumedMap();
                                     consumed[rec.promoCode] = {
@@ -750,6 +768,39 @@
                 }
                 const phonesMap = getRegisteredPhonesMap();
                 return phonesMap[normalizedPhone] || null;
+            }
+
+            async function fetchSingleCodeFromSupabase(code) {
+                const cleanCode = (code || '').trim().toUpperCase();
+                if (!isSupabaseConfigured() || !cleanCode) return null;
+
+                try {
+                    const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?promo_code=eq.${encodeURIComponent(cleanCode)}&select=*`;
+                    const res = await fetch(url, { headers: getSupabaseHeaders() });
+                    if (!res.ok) return null;
+
+                    updateSyncBadge(true);
+                    const rows = await res.json();
+                    if (!Array.isArray(rows) || rows.length === 0) return null;
+
+                    const rec = mapSupabaseRowToRecord(rows[0]);
+                    saveToHistory(rec);
+
+                    if (rec.status === 'UTILISÉ') {
+                        const consumed = getConsumedMap();
+                        consumed[rec.promoCode] = {
+                            code: rec.promoCode,
+                            consumedCodeHash: rec.consumedCodeHash,
+                            usedAt: rec.usedAt || 'Validé par Admin',
+                            lockedAcrossDevices: true
+                        };
+                        safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                    }
+                    return rec;
+                } catch (err) {
+                    updateSyncBadge(false);
+                    return null;
+                }
             }
 
             // =========================================================================
@@ -867,19 +918,34 @@
                 return Object.values(map).find(entry => entry && entry.consumedCodeHash === hash) || null;
             }
 
+            // Consommation à usage unique : vérifie d'abord s'il n'est pas déjà UTILISÉ dans Supabase
             async function markCodeAsConsumed(code, metadata = {}) {
                 const cleanCode = (code || '').trim().toUpperCase();
                 const consumedCodeHash = computeSha256LikeHash(cleanCode);
+
+                // Vérification fraîche dans Supabase pour empêcher un double marquage simultané
+                const latestRow = await fetchSingleCodeFromSupabase(cleanCode);
+                if ((latestRow && latestRow.status === 'UTILISÉ') || isPromoCodeConsumed(cleanCode)) {
+                    const existingEntry = getConsumedEntry(cleanCode) || {
+                        code: cleanCode,
+                        consumedCodeHash,
+                        usedAt: (latestRow && latestRow.usedAt) || 'Déjà utilisé',
+                        lockedAcrossDevices: true
+                    };
+                    return { alreadyUsed: true, entry: existingEntry };
+                }
+
                 const usedAt = new Date().toLocaleString('fr-FR');
                 const consumed = getConsumedMap();
 
-                consumed[cleanCode] = {
+                const usageEntry = {
                     code: cleanCode,
                     consumedCodeHash,
                     usedAt,
                     lockedAcrossDevices: true,
                     ...metadata
                 };
+                consumed[cleanCode] = usageEntry;
                 safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
 
                 const history = getHistoryList();
@@ -891,31 +957,36 @@
 
                 if (isSupabaseConfigured()) {
                     try {
-                        const patchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?promo_code=eq.${encodeURIComponent(cleanCode)}`;
-                        const res = await fetch(patchUrl, {
-                            method: 'PATCH',
-                            headers: getSupabaseHeaders('return=representation'),
-                            body: JSON.stringify({ status: 'UTILISÉ', used_at: usedAt })
-                        });
-                        if (res.ok) {
-                            const updatedRows = await res.json();
-                            if (!updatedRows || updatedRows.length === 0) {
-                                await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
-                                    method: 'POST',
-                                    headers: getSupabaseHeaders(),
-                                    body: JSON.stringify({
-                                        full_name: 'Code Démo / Manuel',
-                                        whatsapp_phone: '',
-                                        normalized_phone: 'DEMO_' + cleanCode,
-                                        desired_service: 'Non précisé',
-                                        percentage_won: metadata.percentageLabel || '',
-                                        promo_code: cleanCode,
-                                        consumed_code_hash: consumedCodeHash,
-                                        status: 'UTILISÉ',
-                                        used_at: usedAt
-                                    })
-                                });
+                        if (latestRow) {
+                            const patchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?promo_code=eq.${encodeURIComponent(cleanCode)}&status=neq.UTILIS%C3%89`;
+                            const res = await fetch(patchUrl, {
+                                method: 'PATCH',
+                                headers: getSupabaseHeaders('return=representation'),
+                                body: JSON.stringify({ status: 'UTILISÉ', used_at: usedAt })
+                            });
+                            if (res.ok) {
+                                const updatedRows = await res.json();
+                                if (!Array.isArray(updatedRows) || updatedRows.length === 0) {
+                                    return { alreadyUsed: true, entry: usageEntry };
+                                }
+                                updateSyncBadge(true);
                             }
+                        } else {
+                            await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+                                method: 'POST',
+                                headers: getSupabaseHeaders(),
+                                body: JSON.stringify({
+                                    full_name: 'Code Démo / Manuel',
+                                    whatsapp_phone: '',
+                                    normalized_phone: 'DEMO_' + cleanCode,
+                                    desired_service: 'Non précisé',
+                                    percentage_won: metadata.percentageLabel || '',
+                                    promo_code: cleanCode,
+                                    consumed_code_hash: consumedCodeHash,
+                                    status: 'UTILISÉ',
+                                    used_at: usedAt
+                                })
+                            });
                             updateSyncBadge(true);
                         }
                     } catch (err) {
@@ -924,6 +995,7 @@
                 }
 
                 syncUIWithSavedState();
+                return { alreadyUsed: false, entry: usageEntry };
             }
 
             async function syncAllFromSupabase() {
@@ -945,6 +1017,9 @@
 
                     const consumed = getConsumedMap();
                     const phonesMap = getRegisteredPhonesMap();
+                    const savedPlayer = getSavedPlayerState();
+                    let updatedSavedPlayer = savedPlayer;
+
                     mappedHistory.forEach(rec => {
                         if (rec.normalizedPhone && !rec.normalizedPhone.startsWith('DEMO_')) {
                             phonesMap[rec.normalizedPhone] = rec;
@@ -957,9 +1032,19 @@
                                 lockedAcrossDevices: true
                             };
                         }
+                        if (savedPlayer && (
+                            savedPlayer.promoCode === rec.promoCode ||
+                            (savedPlayer.normalizedPhone && savedPlayer.normalizedPhone === rec.normalizedPhone)
+                        )) {
+                            updatedSavedPlayer = rec;
+                        }
                     });
+
                     safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
                     safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+                    if (updatedSavedPlayer) {
+                        safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(updatedSavedPlayer));
+                    }
                     syncUIWithSavedState();
                 } catch (err) {
                     updateSyncBadge(false);
@@ -1279,7 +1364,7 @@
                 const signedCode = generateSignedPromoCode(winningSegment.pctCode);
                 const consumedCodeHash = computeSha256LikeHash(signedCode);
 
-                const resultData = {
+                let resultData = {
                     fullName: isDemo ? 'Visiteur Démo' : fullName,
                     whatsappPhone: isDemo ? '' : whatsappPhone,
                     normalizedPhone: isDemo ? '' : normalizedPhone,
@@ -1292,28 +1377,43 @@
                     isDemo: isDemo
                 };
 
-                saveToHistory(resultData);
-
                 if (!isDemo) {
-                    safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
-                    if (normalizedPhone) {
-                        await registerPhoneRecord(normalizedPhone, resultData);
+                    const regResult = await registerPhoneRecord(normalizedPhone, resultData);
+                    if (!regResult.ok && regResult.duplicate && regResult.existing) {
+                        resultData = regResult.existing;
+                        safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
+                        saveToHistory(resultData);
+                        syncUIWithSavedState();
+                        showInlineAlert(
+                            `Ce numéro (${whatsappPhone}) est déjà enregistré dans la base avec le code ${resultData.promoCode}.`,
+                            'warning'
+                        );
+                        await openWinModal(resultData);
+                        return;
                     }
+                    if (regResult.record) {
+                        resultData = regResult.record;
+                    }
+                    safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
+                    saveToHistory(resultData);
                     syncUIWithSavedState();
+                } else {
+                    saveToHistory(resultData);
                 }
 
                 await openWinModal(resultData);
             }
 
             async function openWinModal(data) {
-                await syncAllFromSupabase();
-                const usedEntry = getConsumedEntry(data.promoCode);
-                const used = Boolean(usedEntry);
+                const latestFromDb = await fetchSingleCodeFromSupabase(data.promoCode);
+                const currentData = latestFromDb || data;
+                const usedEntry = getConsumedEntry(currentData.promoCode);
+                const used = Boolean(usedEntry) || currentData.status === 'UTILISÉ';
                 currentModalCodeLocked = used;
 
-                modalPrizeTitle.textContent = `${data.percentageWon} DE RÉDUCTION`;
-                modalPrizeDetail.textContent = `Appliqué sur votre service : ${data.desiredService}`;
-                modalPromoCode.textContent = data.promoCode;
+                modalPrizeTitle.textContent = `${currentData.percentageWon} DE RÉDUCTION`;
+                modalPrizeDetail.textContent = `Appliqué sur votre service : ${currentData.desiredService}`;
+                modalPromoCode.textContent = currentData.promoCode;
                 copyBtnText.textContent = 'Copier le code';
 
                 if (used) {
@@ -1325,9 +1425,10 @@
 
                     modalPromoCode.classList.add('line-through', 'opacity-60');
                     modalUsedWarningBox.classList.remove('hidden');
-                    modalUsedWarningText.textContent = usedEntry && usedEntry.usedAt
-                        ? `Ce code promo a déjà été utilisé le ${usedEntry.usedAt}. L'envoi de réclamation WhatsApp est désactivé.`
-                        : `Ce code promo a déjà été validé par l'équipe TCA. L'envoi de réclamation WhatsApp est désactivé.`;
+                    const usedDateText = (usedEntry && usedEntry.usedAt) || currentData.usedAt;
+                    modalUsedWarningText.textContent = usedDateText
+                        ? `Ce code promo a déjà été utilisé le ${usedDateText}. Il ne peut plus être réclamé ni réutilisé sur aucun appareil.`
+                        : `Ce code promo a déjà été validé par l'équipe TCA. Il ne peut plus être réclamé ni réutilisé sur aucun appareil.`;
 
                     whatsappClaimBtn.href = '#';
                     whatsappClaimBtn.removeAttribute('target');
@@ -1340,9 +1441,9 @@
                     modalCrownBadge.className = 'w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce';
                     modalCrownBadge.innerHTML = '<i class="fas fa-crown"></i>';
 
-                    modalSubtitleBadge.textContent = data.isDemo
+                    modalSubtitleBadge.textContent = currentData.isDemo
                         ? 'MODE DÉMO • CODE CERTIFIÉ'
-                        : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`;
+                        : `FÉLICITATIONS ${currentData.fullName.toUpperCase()} !`;
                     modalSubtitleBadge.className = 'inline-block text-xs font-extrabold uppercase tracking-widest text-tca-gold bg-tca-gold/15 px-3.5 py-1 rounded-full mb-2';
 
                     modalPromoCode.classList.remove('line-through', 'opacity-60');
@@ -1352,11 +1453,11 @@
                         `Bonjour Tunisian Careers Academy ! 🎓🇩🇪`,
                         `Je viens de participer à la *Roue Black Friday TCA* !`,
                         ``,
-                        `👤 *Nom :* ${data.fullName}`,
-                        data.whatsappPhone ? `📱 *Téléphone :* ${data.whatsappPhone}` : ``,
-                        `🎁 *Remise gagnée :* ${data.percentageWon}`,
-                        `📌 *Service choisi :* ${data.desiredService}`,
-                        `🎟️ *Code Promo Certifié :* ${data.promoCode}`,
+                        `👤 *Nom :* ${currentData.fullName}`,
+                        currentData.whatsappPhone ? `📱 *Téléphone :* ${currentData.whatsappPhone}` : ``,
+                        `🎁 *Remise gagnée :* ${currentData.percentageWon}`,
+                        `📌 *Service choisi :* ${currentData.desiredService}`,
+                        `🎟️ *Code Promo Certifié :* ${currentData.promoCode}`,
                         ``,
                         `Je souhaite réclamer mon offre Black Friday dès maintenant !`
                     ].filter(line => line !== '');
@@ -1430,7 +1531,7 @@
                 }
 
                 adminHistoryList.innerHTML = history.map(item => {
-                    const isUsed = isPromoCodeConsumed(item.promoCode);
+                    const isUsed = isPromoCodeConsumed(item.promoCode) || item.status === 'UTILISÉ';
                     const usedInfo = getConsumedEntry(item.promoCode);
                     const statusBadge = isUsed
                         ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">UTILISÉ</span>`
@@ -1446,7 +1547,7 @@
                                 </div>
                                 <p class="text-[11px] text-gray-400 truncate">
                                     ${item.fullName} • ${item.desiredService} • Créé : ${item.createdAt || '—'}
-                                    ${usedInfo && usedInfo.usedAt ? ` • Utilisé : ${usedInfo.usedAt}` : ''}
+                                    ${(usedInfo && usedInfo.usedAt) || item.usedAt ? ` • Utilisé : ${(usedInfo && usedInfo.usedAt) || item.usedAt}` : ''}
                                 </p>
                             </div>
                             <div class="flex items-center gap-1.5 shrink-0">
@@ -1491,9 +1592,13 @@
                     return;
                 }
 
-                await syncAllFromSupabase();
+                const latestRow = await fetchSingleCodeFromSupabase(check.code);
+                const alreadyUsedInfo = getConsumedEntry(check.code) || (
+                    latestRow && latestRow.status === 'UTILISÉ'
+                        ? { usedAt: latestRow.usedAt || 'Validé par Admin' }
+                        : null
+                );
 
-                const alreadyUsedInfo = getConsumedEntry(check.code);
                 const matchingHistory = getHistoryList().filter(
                     h => h.promoCode === check.code || h.consumedCodeHash === check.consumedCodeHash
                 );
@@ -1527,7 +1632,7 @@
                                     Code <span class="font-mono text-tca-gold">${check.code}</span> (${check.percentageLabel})
                                 </p>
                                 <p class="text-xs text-amber-200 mt-1">
-                                    Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ne peut plus être réutilisé ailleurs.
+                                    Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ce code est à usage unique et ne peut plus être utilisé.
                                 </p>
                                 ${historyTimelineHtml}
                             </div>
@@ -1544,7 +1649,7 @@
                         </div>
                         <div class="flex-grow">
                             <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 mb-1">
-                                CODE AUTHENTIQUE & DISPONIBLE
+                                CODE AUTHENTIQUE & DISPONIBLE (1 UTILISATION POSSIBLE)
                             </span>
                             <p class="text-base font-extrabold text-white mt-0.5">
                                 Réduction certifiée : <span class="text-tca-gold text-lg">${check.percentageLabel}</span>
@@ -1553,7 +1658,7 @@
                             ${historyTimelineHtml}
                             <button type="button" id="markCodeUsedBtn"
                                 class="mt-3 w-full py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                                <i class="fas fa-check-double"></i> Marquer ce code comme UTILISÉ (Bloquer sur tous appareils)
+                                <i class="fas fa-check-double"></i> Valider et marquer comme UTILISÉ (Usage unique)
                             </button>
                         </div>
                     </div>
@@ -1562,6 +1667,7 @@
                 const markBtn = document.getElementById('markCodeUsedBtn');
                 if (markBtn) {
                     markBtn.addEventListener('click', async () => {
+                        markBtn.disabled = true;
                         await markCodeAsConsumed(check.code, { percentageLabel: check.percentageLabel });
                         renderAdminHistory();
                         await performAdminCodeCheck(check.code);
@@ -1589,7 +1695,7 @@
                     savedPrizeLabel.textContent = `${saved.percentageWon} (${saved.desiredService})`;
                     savedPromoCode.textContent = saved.promoCode;
 
-                    if (isPromoCodeConsumed(saved.promoCode)) {
+                    if (isPromoCodeConsumed(saved.promoCode) || saved.status === 'UTILISÉ') {
                         savedCodeStatus.textContent = 'DÉJÀ UTILISÉ (BLOQUÉ)';
                         savedCodeStatus.className = 'text-xs font-bold text-amber-400';
                         reopenModalBtn.innerHTML = '<i class="fas fa-ban"></i> Voir mon reçu (Code déjà utilisé)';
@@ -1625,6 +1731,8 @@
             // 14. ÉCOUTEURS D'ÉVÉNEMENTS
             // =========================================================================
             async function handleValidatedFormSpin() {
+                if (isSpinning) return;
+
                 const saved = getSavedPlayerState();
                 if (saved) {
                     await openWinModal(saved);
@@ -1648,12 +1756,14 @@
                     return;
                 }
 
+                // Vérification obligatoire dans Supabase : bloque le numéro sur tous les appareils
                 const existingRecord = await lookupExistingParticipation(normalizedPhone);
                 if (existingRecord) {
                     safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(existingRecord));
+                    saveToHistory(existingRecord);
                     syncUIWithSavedState();
                     showInlineAlert(
-                        `Ce numéro (${whatsappPhone}) a déjà participé et reçu le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Aucune nouvelle participation n'est autorisée.`,
+                        `Ce numéro (${whatsappPhone}) a déjà été utilisé sur la roue et possède le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Il ne peut pas rejouer.`,
                         'warning'
                     );
                     await openWinModal(existingRecord);
@@ -1690,10 +1800,14 @@
                 if (saved) await openWinModal(saved);
             });
 
-            whatsappClaimBtn.addEventListener('click', (e) => {
+            whatsappClaimBtn.addEventListener('click', async (e) => {
                 const currentCode = modalPromoCode.textContent.trim();
-                if (currentModalCodeLocked || isPromoCodeConsumed(currentCode)) {
+                const latestRow = await fetchSingleCodeFromSupabase(currentCode);
+                const isAlreadyConsumed = currentModalCodeLocked || isPromoCodeConsumed(currentCode) || (latestRow && latestRow.status === 'UTILISÉ');
+
+                if (isAlreadyConsumed) {
                     e.preventDefault();
+                    currentModalCodeLocked = true;
                     modalUsedWarningBox.classList.remove('hidden');
                     showInlineAlert(`Le code ${currentCode} a déjà été utilisé et ne peut plus être réclamé sur WhatsApp.`, 'warning');
                 }
@@ -1761,7 +1875,7 @@
                 safeStorage.removeItem(STORAGE_KEY_PLAYER);
                 syncUIWithSavedState();
                 closeAdminModal();
-                showInlineAlert('Affichage local réinitialisé : les numéros enregistrés et codes consommés dans Supabase restent bloqués.', 'success');
+                showInlineAlert('Affichage local réinitialisé : les numéros WhatsApp enregistrés et codes consommés dans Supabase restent bloqués sur tous les appareils.', 'success');
             });
 
             adminLockBtn.addEventListener('click', () => {
