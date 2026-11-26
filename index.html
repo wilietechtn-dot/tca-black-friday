@@ -107,7 +107,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <span id="syncStatusBadge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] bg-white/5 border border-white/10 text-gray-300 px-2.5 py-1 rounded-full">
-                    <i class="fas fa-database text-tca-gold"></i> Mode Local (API prête)
+                    <i class="fas fa-database text-tca-gold"></i> Connexion Supabase...
                 </span>
                 <!-- Contrôle du son -->
                 <button id="soundToggleBtn" type="button" class="flex items-center gap-1.5 text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full transition cursor-pointer" title="Activer/Désactiver le son">
@@ -145,7 +145,7 @@
             </div>
 
             <!-- Badge Offre Spéciale Black Friday -->
-            <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-tca-redDark via-tca-red to-tca-redDark px-4 py-2 rounded-full shadow-lg border border-t-ca-gold/60 animate-float">
+            <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-tca-redDark via-tca-red to-tca-redDark px-4 py-2 rounded-full shadow-lg border border-tca-gold/60 animate-float">
                 <span class="flex h-2.5 w-2.5 relative">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tca-gold opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tca-gold"></span>
@@ -169,7 +169,7 @@
                 Tentez votre chance et gagnez jusqu’à <span class="text-transparent bg-clip-text bg-gradient-to-r from-tca-gold via-yellow-200 to-tca-gold">-20%</span> sur votre projet !
             </h1>
             <p class="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto">
-                Cours d'Allemand (A1 à B2), Consultation personnalisée ou Équivalence de diplôme : tournez la roue Black Friday et débloquez immédiatement votre remise exclusive TCA.
+                Cours d'Allemand (A1 à B2), Consultation, Coaching ou Équivalence de diplôme : tournez la roue Black Friday et débloquez immédiatement votre remise exclusive TCA.
             </p>
         </div>
 
@@ -215,7 +215,7 @@
                 </div>
 
                 <!-- Légende des services éligibles sous la roue -->
-                <div class="mt-6 flex flex-wrap justify-center gap-3 text-xs text-gray-400">
+                <div class="mt-6 flex flex-wrap justify-center gap-2.5 text-xs text-gray-400">
                     <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
                         <i class="fas fa-graduation-cap text-tca-red"></i> Cours A1-B2
                     </span>
@@ -224,6 +224,9 @@
                     </span>
                     <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
                         <i class="fas fa-comments text-emerald-400"></i> Consultation
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                        <i class="fas fa-user-tie text-sky-400"></i> Coaching
                     </span>
                 </div>
             </div>
@@ -298,6 +301,7 @@
                                         <option value="Cours d'Allemand A1–B2">Cours d'Allemand A1–B2</option>
                                         <option value="Équivalence de diplôme">Équivalence de diplôme</option>
                                         <option value="Consultation">Consultation</option>
+                                        <option value="Coaching">Coaching</option>
                                     </select>
                                     <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 pointer-events-none">
                                         <i class="fas fa-chevron-down text-xs"></i>
@@ -556,12 +560,15 @@
     <script>
         (function () {
             // =========================================================================
-            // 1. CONFIGURATION, CLÉS DE SÉCURITÉ & ENDPOINT MULTI-APPAREILS TCA
+            // 1. CONFIGURATION SUPABASE & CLÉS DE SÉCURITÉ TCA
             // =========================================================================
+            const SUPABASE_URL = 'https://dywaiutdvzccqlvcysww.supabase.co';
+            const SUPABASE_PUBLISHABLE_KEY = 'COLLEZ_VOTRE_CLE_PUBLISHABLE_ICI';
+            const SUPABASE_TABLE = 'tca_wheel_participations';
+
             const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
             const TCA_ADMIN_PIN = 'TCA2026';
             const TCA_WHATSAPP_NUMBER = '21629664429';
-            const TCA_SHARED_API_URL = '';
 
             const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v8';
             const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v8';
@@ -580,28 +587,21 @@
             ];
 
             // =========================================================================
-            // 2. STOCKAGE SÉCURISÉ (AVEC REPLI EN MÉMOIRE SI IFRAME SANDBOXÉE)
+            // 2. STOCKAGE LOCAL DE SECOURS
             // =========================================================================
             let memoryStorage = {};
             const safeStorage = {
                 getItem(key) {
-                    try {
-                        return window.localStorage.getItem(key);
-                    } catch (e) {
-                        return memoryStorage[key] || null;
-                    }
+                    try { return window.localStorage.getItem(key); }
+                    catch (e) { return memoryStorage[key] || null; }
                 },
                 setItem(key, value) {
                     memoryStorage[key] = value;
-                    try {
-                        window.localStorage.setItem(key, value);
-                    } catch (e) {}
+                    try { window.localStorage.setItem(key, value); } catch (e) {}
                 },
                 removeItem(key) {
                     delete memoryStorage[key];
-                    try {
-                        window.localStorage.removeItem(key);
-                    } catch (e) {}
+                    try { window.localStorage.removeItem(key); } catch (e) {}
                 }
             };
 
@@ -610,10 +610,7 @@
             // =========================================================================
             function computeSha256LikeHash(inputStr) {
                 const text = `${TCA_SECRET_KEY}::${(inputStr || '').trim().toUpperCase()}`;
-                let h1 = 0xdeadbeef;
-                let h2 = 0x41c6ce57;
-                let h3 = 0x9e3779b9;
-                let h4 = 0x85ebca6b;
+                let h1 = 0xdeadbeef, h2 = 0x41c6ce57, h3 = 0x9e3779b9, h4 = 0x85ebca6b;
 
                 for (let i = 0; i < text.length; i++) {
                     const ch = text.charCodeAt(i);
@@ -632,57 +629,64 @@
 
             function normalizePhone(rawPhone) {
                 let digits = (rawPhone || '').replace(/\D/g, '');
-                if (digits.startsWith('00')) {
-                    digits = digits.slice(2);
-                }
-                if (digits.length === 8) {
-                    digits = '216' + digits;
-                }
+                if (digits.startsWith('00')) digits = digits.slice(2);
+                if (digits.length === 8) digits = '216' + digits;
                 return digits;
             }
 
             // =========================================================================
-            // 4. COUPLEUR BASE PARTAGÉE / BACKEND MULTI-APPAREILS (AVEC CACHE LOCAL)
+            // 4. CONNEXION SUPABASE REST API (MULTI-APPAREILS & USAGE UNIQUE)
             // =========================================================================
             const syncStatusBadge = document.getElementById('syncStatusBadge');
+
+            function isSupabaseConfigured() {
+                return Boolean(
+                    SUPABASE_URL &&
+                    SUPABASE_PUBLISHABLE_KEY &&
+                    SUPABASE_PUBLISHABLE_KEY !== 'COLLEZ_VOTRE_CLE_PUBLISHABLE_ICI'
+                );
+            }
+
+            function getSupabaseHeaders(prefer = '') {
+                const headers = {
+                    'apikey': SUPABASE_PUBLISHABLE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+                    'Content-Type': 'application/json'
+                };
+                if (prefer) headers['Prefer'] = prefer;
+                return headers;
+            }
 
             function updateSyncBadge(onlineMode) {
                 if (!syncStatusBadge) return;
                 if (onlineMode) {
-                    syncStatusBadge.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> Base partagée active`;
+                    syncStatusBadge.innerHTML = `<i class="fas fa-check-circle text-emerald-400"></i> Supabase connecté`;
                 } else {
-                    syncStatusBadge.innerHTML = `<i class="fas fa-database text-tca-gold"></i> Mode Local (API prête)`;
+                    syncStatusBadge.innerHTML = `<i class="fas fa-exclamation-triangle text-amber-400"></i> Clé Supabase requise`;
                 }
             }
 
-            async function callSharedBackend(action, payload = {}) {
-                if (!TCA_SHARED_API_URL) {
-                    updateSyncBadge(false);
-                    return null;
-                }
-                try {
-                    const response = await fetch(TCA_SHARED_API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action, ...payload })
-                    });
-                    if (!response.ok) throw new Error('HTTP ' + response.status);
-                    const data = await response.json();
-                    updateSyncBadge(true);
-                    return data;
-                } catch (err) {
-                    updateSyncBadge(false);
-                    return null;
-                }
+            function mapSupabaseRowToRecord(row) {
+                return {
+                    createdAt: row.created_at ? new Date(row.created_at).toLocaleString('fr-FR') : '',
+                    fullName: row.full_name,
+                    whatsappPhone: row.whatsapp_phone,
+                    normalizedPhone: row.normalized_phone,
+                    desiredService: row.desired_service,
+                    percentageWon: row.percentage_won,
+                    promoCode: row.promo_code,
+                    consumedCodeHash: row.consumed_code_hash,
+                    status: row.status,
+                    usedAt: row.used_at || '',
+                    isDemo: false
+                };
             }
 
             function getRegisteredPhonesMap() {
                 try {
                     const raw = safeStorage.getItem(STORAGE_KEY_PHONES);
                     return raw ? JSON.parse(raw) : {};
-                } catch (e) {
-                    return {};
-                }
+                } catch (e) { return {}; }
             }
 
             async function registerPhoneRecord(normalizedPhone, record) {
@@ -690,24 +694,62 @@
                 const phonesMap = getRegisteredPhonesMap();
                 phonesMap[normalizedPhone] = record;
                 safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
-                await callSharedBackend('register_participation', {
-                    normalizedPhone,
-                    record
-                });
+
+                if (!isSupabaseConfigured()) return;
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+                        method: 'POST',
+                        headers: getSupabaseHeaders('return=representation'),
+                        body: JSON.stringify({
+                            full_name: record.fullName,
+                            whatsapp_phone: record.whatsappPhone,
+                            normalized_phone: normalizedPhone,
+                            desired_service: record.desiredService,
+                            percentage_won: record.percentageWon,
+                            promo_code: record.promoCode,
+                            consumed_code_hash: record.consumedCodeHash,
+                            status: 'ACTIF'
+                        })
+                    });
+                    if (res.ok) updateSyncBadge(true);
+                } catch (err) {
+                    updateSyncBadge(false);
+                }
             }
 
             async function lookupExistingParticipation(normalizedPhone) {
+                if (isSupabaseConfigured()) {
+                    try {
+                        const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?normalized_phone=eq.${encodeURIComponent(normalizedPhone)}&select=*`;
+                        const res = await fetch(url, { headers: getSupabaseHeaders() });
+                        if (res.ok) {
+                            updateSyncBadge(true);
+                            const rows = await res.json();
+                            if (Array.isArray(rows) && rows.length > 0) {
+                                const rec = mapSupabaseRowToRecord(rows[0]);
+                                const phonesMap = getRegisteredPhonesMap();
+                                phonesMap[normalizedPhone] = rec;
+                                safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+                                if (rec.status === 'UTILISÉ') {
+                                    const consumed = getConsumedMap();
+                                    consumed[rec.promoCode] = {
+                                        code: rec.promoCode,
+                                        consumedCodeHash: rec.consumedCodeHash,
+                                        usedAt: rec.usedAt || 'Validé par Admin',
+                                        lockedAcrossDevices: true
+                                    };
+                                    safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                                }
+                                return rec;
+                            }
+                            return null;
+                        }
+                    } catch (err) {
+                        updateSyncBadge(false);
+                    }
+                }
                 const phonesMap = getRegisteredPhonesMap();
-                if (phonesMap[normalizedPhone]) {
-                    return phonesMap[normalizedPhone];
-                }
-                const remote = await callSharedBackend('check_phone', { normalizedPhone });
-                if (remote && remote.exists && remote.record) {
-                    phonesMap[normalizedPhone] = remote.record;
-                    safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
-                    return remote.record;
-                }
-                return null;
+                return phonesMap[normalizedPhone] || null;
             }
 
             // =========================================================================
@@ -717,8 +759,7 @@
 
             function computeSignatureChecksum(pctCode, randomToken) {
                 const payload = `${TCA_SECRET_KEY}|TCA|${pctCode}|${randomToken}`;
-                let h1 = 0x811c9dc5;
-                let h2 = 0x1b873593;
+                let h1 = 0x811c9dc5, h2 = 0x1b873593;
 
                 for (let i = 0; i < payload.length; i++) {
                     const ch = payload.charCodeAt(i);
@@ -785,9 +826,7 @@
                 try {
                     const raw = safeStorage.getItem(STORAGE_KEY_HISTORY);
                     return raw ? JSON.parse(raw) : [];
-                } catch (e) {
-                    return [];
-                }
+                } catch (e) { return []; }
             }
 
             function saveToHistory(entry) {
@@ -810,9 +849,7 @@
                 try {
                     const raw = safeStorage.getItem(STORAGE_KEY_CONSUMED);
                     return raw ? JSON.parse(raw) : {};
-                } catch (e) {
-                    return {};
-                }
+                } catch (e) { return {}; }
             }
 
             function isPromoCodeConsumed(code) {
@@ -833,68 +870,99 @@
             async function markCodeAsConsumed(code, metadata = {}) {
                 const cleanCode = (code || '').trim().toUpperCase();
                 const consumedCodeHash = computeSha256LikeHash(cleanCode);
+                const usedAt = new Date().toLocaleString('fr-FR');
                 const consumed = getConsumedMap();
-                const usageEntry = {
+
+                consumed[cleanCode] = {
                     code: cleanCode,
                     consumedCodeHash,
-                    usedAt: new Date().toLocaleString('fr-FR'),
+                    usedAt,
                     lockedAcrossDevices: true,
                     ...metadata
                 };
-
-                if (!consumed[cleanCode]) {
-                    consumed[cleanCode] = usageEntry;
-                    safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
-                }
+                safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
 
                 const history = getHistoryList();
                 const idx = history.findIndex(item => item.promoCode === cleanCode);
                 if (idx !== -1) {
-                    history[idx] = {
-                        ...history[idx],
-                        status: 'UTILISÉ',
-                        usedAt: consumed[cleanCode].usedAt,
-                        consumedCodeHash
-                    };
+                    history[idx] = { ...history[idx], status: 'UTILISÉ', usedAt, consumedCodeHash };
                     safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
                 }
 
-                await callSharedBackend('consume_code', {
-                    code: cleanCode,
-                    consumedCodeHash,
-                    usageEntry
-                });
+                if (isSupabaseConfigured()) {
+                    try {
+                        const patchUrl = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?promo_code=eq.${encodeURIComponent(cleanCode)}`;
+                        const res = await fetch(patchUrl, {
+                            method: 'PATCH',
+                            headers: getSupabaseHeaders('return=representation'),
+                            body: JSON.stringify({ status: 'UTILISÉ', used_at: usedAt })
+                        });
+                        if (res.ok) {
+                            const updatedRows = await res.json();
+                            if (!updatedRows || updatedRows.length === 0) {
+                                await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`, {
+                                    method: 'POST',
+                                    headers: getSupabaseHeaders(),
+                                    body: JSON.stringify({
+                                        full_name: 'Code Démo / Manuel',
+                                        whatsapp_phone: '',
+                                        normalized_phone: 'DEMO_' + cleanCode,
+                                        desired_service: 'Non précisé',
+                                        percentage_won: metadata.percentageLabel || '',
+                                        promo_code: cleanCode,
+                                        consumed_code_hash: consumedCodeHash,
+                                        status: 'UTILISÉ',
+                                        used_at: usedAt
+                                    })
+                                });
+                            }
+                            updateSyncBadge(true);
+                        }
+                    } catch (err) {
+                        updateSyncBadge(false);
+                    }
+                }
 
                 syncUIWithSavedState();
             }
 
-            async function fetchRemoteCodeStatus(code) {
-                const cleanCode = (code || '').trim().toUpperCase();
-                const consumedCodeHash = computeSha256LikeHash(cleanCode);
-                const remote = await callSharedBackend('check_code', {
-                    code: cleanCode,
-                    consumedCodeHash
-                });
+            async function syncAllFromSupabase() {
+                if (!isSupabaseConfigured()) {
+                    updateSyncBadge(false);
+                    return;
+                }
+                try {
+                    const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=created_at.desc&limit=150`;
+                    const res = await fetch(url, { headers: getSupabaseHeaders() });
+                    if (!res.ok) return;
 
-                if (remote && Array.isArray(remote.history)) {
-                    const localHistory = getHistoryList();
-                    remote.history.forEach(item => {
-                        if (!localHistory.some(h => h.promoCode === item.promoCode)) {
-                            localHistory.push(item);
+                    updateSyncBadge(true);
+                    const rows = await res.json();
+                    if (!Array.isArray(rows)) return;
+
+                    const mappedHistory = rows.map(mapSupabaseRowToRecord);
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(mappedHistory));
+
+                    const consumed = getConsumedMap();
+                    const phonesMap = getRegisteredPhonesMap();
+                    mappedHistory.forEach(rec => {
+                        if (rec.normalizedPhone && !rec.normalizedPhone.startsWith('DEMO_')) {
+                            phonesMap[rec.normalizedPhone] = rec;
+                        }
+                        if (rec.status === 'UTILISÉ') {
+                            consumed[rec.promoCode] = {
+                                code: rec.promoCode,
+                                consumedCodeHash: rec.consumedCodeHash,
+                                usedAt: rec.usedAt || 'Validé par Admin',
+                                lockedAcrossDevices: true
+                            };
                         }
                     });
-                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(localHistory.slice(0, 150)));
-                }
-
-                if (remote && remote.consumed && remote.consumed.usedAt) {
-                    const consumed = getConsumedMap();
-                    consumed[cleanCode] = {
-                        code: cleanCode,
-                        consumedCodeHash,
-                        usedAt: remote.consumed.usedAt,
-                        lockedAcrossDevices: true
-                    };
                     safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+                    safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
+                    syncUIWithSavedState();
+                } catch (err) {
+                    updateSyncBadge(false);
                 }
             }
 
@@ -973,13 +1041,9 @@
                 try {
                     if (!audioCtx) {
                         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                        if (AudioContextClass) {
-                            audioCtx = new AudioContextClass();
-                        }
+                        if (AudioContextClass) audioCtx = new AudioContextClass();
                     }
-                    if (audioCtx && audioCtx.state === 'suspended') {
-                        audioCtx.resume();
-                    }
+                    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
                 } catch (e) {}
             }
 
@@ -993,10 +1057,8 @@
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(720, audioCtx.currentTime);
                     osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.035);
-
                     gain.gain.setValueAtTime(0.16, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.035);
-
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
                     osc.start();
@@ -1016,11 +1078,9 @@
                         const startTime = audioCtx.currentTime + idx * 0.11;
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, startTime);
-
                         gain.gain.setValueAtTime(0.001, startTime);
                         gain.gain.linearRampToValueAtTime(0.22, startTime + 0.03);
                         gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.45);
-
                         osc.connect(gain);
                         gain.connect(audioCtx.destination);
                         osc.start(startTime);
@@ -1034,7 +1094,6 @@
             // =========================================================================
             function drawWheel() {
                 if (!canvas || !ctx) return;
-
                 const dpr = window.devicePixelRatio || 1;
                 const rect = canvas.getBoundingClientRect();
                 const size = rect.width > 0 ? rect.width : 360;
@@ -1116,9 +1175,7 @@
                 const totalWeight = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
                 let random = Math.random() * totalWeight;
                 for (let i = 0; i < SEGMENTS.length; i++) {
-                    if (random < SEGMENTS[i].weight) {
-                        return i;
-                    }
+                    if (random < SEGMENTS[i].weight) return i;
                     random -= SEGMENTS[i].weight;
                 }
                 return 0;
@@ -1162,9 +1219,7 @@
                 const durationMs = 4600;
                 const startTime = performance.now();
 
-                function easeOutQuart(t) {
-                    return 1 - Math.pow(1 - t, 4);
-                }
+                function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
 
                 function animateFrame(now) {
                     const elapsed = now - startTime;
@@ -1193,12 +1248,8 @@
                         const actualWinningIndex = getSegmentIndexUnderTopPointer(currentRotation);
                         const winningSegment = SEGMENTS[actualWinningIndex];
                         onSpinComplete({
-                            fullName,
-                            whatsappPhone,
-                            normalizedPhone,
-                            desiredService,
-                            winningSegment,
-                            isDemo
+                            fullName, whatsappPhone, normalizedPhone,
+                            desiredService, winningSegment, isDemo
                         });
                     }
                 }
@@ -1255,7 +1306,7 @@
             }
 
             async function openWinModal(data) {
-                await fetchRemoteCodeStatus(data.promoCode);
+                await syncAllFromSupabase();
                 const usedEntry = getConsumedEntry(data.promoCode);
                 const used = Boolean(usedEntry);
                 currentModalCodeLocked = used;
@@ -1284,7 +1335,6 @@
                     whatsappClaimBtn.className = 'w-full py-3.5 px-5 rounded-xl bg-gray-700/80 border border-white/10 text-gray-400 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-not-allowed select-none';
                     whatsappClaimIcon.className = 'fas fa-lock text-lg text-amber-400';
                     whatsappClaimLabel.textContent = 'Code déjà utilisé — Réclamation bloquée';
-
                     modalFooterNote.textContent = 'Ce code a déjà été consommé et ne peut plus être réclamé.';
                 } else {
                     modalCrownBadge.className = 'w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce';
@@ -1318,7 +1368,6 @@
                     whatsappClaimBtn.className = 'w-full py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5';
                     whatsappClaimIcon.className = 'fab fa-whatsapp text-xl';
                     whatsappClaimLabel.textContent = 'Réclamer sur WhatsApp (+216 29 664 429)';
-
                     modalFooterNote.textContent = 'Une fois utilisé, ce code est bloqué définitivement sur tous les appareils.';
                 }
 
@@ -1340,14 +1389,15 @@
             }
 
             // =========================================================================
-            // 12. PANNEAU ADMIN : VÉRIFICATION D'AUTHENTICITÉ & HISTORIQUE LIÉ
+            // 12. PANNEAU ADMIN : VÉRIFICATION D'AUTHENTICITÉ & HISTORIQUE SUPABASE
             // =========================================================================
-            function openAdminModal() {
+            async function openAdminModal() {
                 adminModal.classList.remove('hidden');
                 adminModal.classList.add('flex');
                 if (isAdminUnlocked) {
                     adminAuthSection.classList.add('hidden');
                     adminDashboardSection.classList.remove('hidden');
+                    await syncAllFromSupabase();
                     renderAdminHistory();
                 } else {
                     adminAuthSection.classList.remove('hidden');
@@ -1441,7 +1491,7 @@
                     return;
                 }
 
-                await fetchRemoteCodeStatus(check.code);
+                await syncAllFromSupabase();
 
                 const alreadyUsedInfo = getConsumedEntry(check.code);
                 const matchingHistory = getHistoryList().filter(
@@ -1479,9 +1529,6 @@
                                 <p class="text-xs text-amber-200 mt-1">
                                     Déjà consommé le : <strong>${alreadyUsedInfo.usedAt}</strong> — ne peut plus être réutilisé ailleurs.
                                 </p>
-                                <p class="text-[10px] font-mono text-gray-400 mt-1 break-all">
-                                    Empreinte : ${check.consumedCodeHash}
-                                </p>
                                 ${historyTimelineHtml}
                             </div>
                         </div>
@@ -1503,9 +1550,6 @@
                                 Réduction certifiée : <span class="text-tca-gold text-lg">${check.percentageLabel}</span>
                             </p>
                             <p class="text-xs font-mono text-gray-300 mt-0.5">${check.code}</p>
-                            <p class="text-[10px] font-mono text-gray-400 mt-1 break-all">
-                                Empreinte : ${check.consumedCodeHash}
-                            </p>
                             ${historyTimelineHtml}
                             <button type="button" id="markCodeUsedBtn"
                                 class="mt-3 w-full py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
@@ -1532,9 +1576,7 @@
                 try {
                     const raw = safeStorage.getItem(STORAGE_KEY_PLAYER);
                     return raw ? JSON.parse(raw) : null;
-                } catch (e) {
-                    return null;
-                }
+                } catch (e) { return null; }
             }
 
             function syncUIWithSavedState() {
@@ -1577,9 +1619,7 @@
                 inlineAlertText.textContent = message;
             }
 
-            function hideInlineAlert() {
-                inlineAlert.classList.add('hidden');
-            }
+            function hideInlineAlert() { inlineAlert.classList.add('hidden'); }
 
             // =========================================================================
             // 14. ÉCOUTEURS D'ÉVÉNEMENTS
@@ -1621,11 +1661,8 @@
                 }
 
                 triggerWheelSpin({
-                    fullName,
-                    whatsappPhone,
-                    normalizedPhone,
-                    desiredService,
-                    isDemo: false
+                    fullName, whatsappPhone, normalizedPhone,
+                    desiredService, isDemo: false
                 });
             }
 
@@ -1676,9 +1713,7 @@
                 try {
                     document.execCommand('copy');
                     copyBtnText.textContent = 'Copié !';
-                    setTimeout(() => {
-                        copyBtnText.textContent = 'Copier le code';
-                    }, 2200);
+                    setTimeout(() => { copyBtnText.textContent = 'Copier le code'; }, 2200);
                 } catch (e) {}
                 document.body.removeChild(tempInput);
             });
@@ -1700,7 +1735,7 @@
                 if (e.target === adminModal) closeAdminModal();
             });
 
-            adminLoginForm.addEventListener('submit', (e) => {
+            adminLoginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const enteredPin = adminPasswordInput.value.trim();
                 if (enteredPin === TCA_ADMIN_PIN) {
@@ -1708,6 +1743,7 @@
                     adminAuthError.classList.add('hidden');
                     adminAuthSection.classList.add('hidden');
                     adminDashboardSection.classList.remove('hidden');
+                    await syncAllFromSupabase();
                     renderAdminHistory();
                 } else {
                     adminAuthError.classList.remove('hidden');
@@ -1725,7 +1761,7 @@
                 safeStorage.removeItem(STORAGE_KEY_PLAYER);
                 syncUIWithSavedState();
                 closeAdminModal();
-                showInlineAlert('Affichage local réinitialisé : les numéros enregistrés et codes consommés restent bloqués.', 'success');
+                showInlineAlert('Affichage local réinitialisé : les numéros enregistrés et codes consommés dans Supabase restent bloqués.', 'success');
             });
 
             adminLockBtn.addEventListener('click', () => {
@@ -1743,6 +1779,7 @@
             window.addEventListener('resize', drawWheel);
             syncUIWithSavedState();
             drawWheel();
+            syncAllFromSupabase();
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(drawWheel);
             }
