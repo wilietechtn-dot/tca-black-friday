@@ -696,7 +696,7 @@
                 safeStorage.setItem(STORAGE_KEY_PHONES, JSON.stringify(phonesMap));
 
                 if (!isSupabaseConfigured()) {
-                    return { ok: true, offline: true };
+                    return { ok: false, errorMessage: 'Clé Supabase non configurée.' };
                 }
 
                 try {
@@ -727,10 +727,15 @@
                         return { ok: false, duplicate: true, existing };
                     }
 
-                    return { ok: false };
+                    let errDetail = `Erreur Supabase (${res.status})`;
+                    try {
+                        const errJson = await res.json();
+                        if (errJson && errJson.message) errDetail += ` : ${errJson.message}`;
+                    } catch (e) {}
+                    return { ok: false, errorMessage: errDetail };
                 } catch (err) {
                     updateSyncBadge(false);
-                    return { ok: false };
+                    return { ok: false, errorMessage: 'Impossible de contacter Supabase (réseau ou incident temporaire).' };
                 }
             }
 
@@ -1390,6 +1395,11 @@
                         );
                         await openWinModal(resultData);
                         return;
+                    }
+                    if (!regResult.ok && regResult.errorMessage) {
+                        showInlineAlert(regResult.errorMessage, 'warning');
+                    } else if (regResult.ok) {
+                        showInlineAlert('Participation enregistrée dans Supabase.', 'success');
                     }
                     if (regResult.record) {
                         resultData = regResult.record;
