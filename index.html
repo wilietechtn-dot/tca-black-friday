@@ -145,7 +145,7 @@
             </div>
 
             <!-- Badge Offre Spéciale Black Friday -->
-            <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-tca-redDark via-tca-red to-tca-redDark px-4 py-2 rounded-full shadow-lg border border-tca-gold/60 animate-float">
+            <div class="inline-flex items-center gap-2.5 bg-gradient-to-r from-tca-redDark via-tca-red to-tca-redDark px-4 py-2 rounded-full shadow-lg border border-t-ca-gold/60 animate-float">
                 <span class="flex h-2.5 w-2.5 relative">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tca-gold opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-tca-gold"></span>
@@ -394,7 +394,7 @@
 
             <!-- Badge Victoire -->
             <div class="text-center">
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce">
+                <div id="modalCrownBadge" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce">
                     <i class="fas fa-crown"></i>
                 </div>
 
@@ -433,14 +433,27 @@
                     </div>
                 </div>
 
+                <!-- Avertissement explicite si le code a déjà été utilisé -->
+                <div id="modalUsedWarningBox" class="hidden mb-4 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/50 text-left flex items-start gap-3">
+                    <i class="fas fa-ban text-amber-400 text-lg mt-0.5 shrink-0"></i>
+                    <div class="text-xs text-amber-100 leading-relaxed">
+                        <p class="font-extrabold uppercase tracking-wider text-amber-300 mb-0.5">
+                            Code promo déjà utilisé • Réclamation bloquée
+                        </p>
+                        <p id="modalUsedWarningText">
+                            Ce code a déjà été validé par l'équipe TCA et ne peut plus être réclamé ni réutilisé.
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Bouton WhatsApp Direct -->
                 <a id="whatsappClaimBtn" href="#" target="_blank" rel="noopener noreferrer"
                     class="w-full py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5">
-                    <i class="fab fa-whatsapp text-xl"></i>
-                    <span>Réclamer sur WhatsApp (+216 29 664 429)</span>
+                    <i id="whatsappClaimIcon" class="fab fa-whatsapp text-xl"></i>
+                    <span id="whatsappClaimLabel">Réclamer sur WhatsApp (+216 29 664 429)</span>
                 </a>
 
-                <p class="text-[11px] text-gray-400 mt-3">
+                <p id="modalFooterNote" class="text-[11px] text-gray-400 mt-3">
                     Une fois utilisé, ce code est bloqué définitivement sur tous les appareils.
                 </p>
             </div>
@@ -548,15 +561,12 @@
             const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
             const TCA_ADMIN_PIN = 'TCA2026';
             const TCA_WHATSAPP_NUMBER = '21629664429';
-
-            // Renseignez ici l'URL de votre endpoint backend / serverless (ex: /api/tca-wheel ou Supabase Edge Function)
-            // Si vide, le mode local est utilisé automatiquement avec structure prête pour la synchronisation serveur.
             const TCA_SHARED_API_URL = '';
 
-            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v7';
-            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v7';
-            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v7';
-            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v7';
+            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v8';
+            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v8';
+            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v8';
+            const STORAGE_KEY_PHONES = 'tca_bf_wheel_phones_v8';
 
             const SEGMENTS = [
                 { id: 'pct-5-a', percentage: '-5%', pctCode: '05', weight: 30, bgColor: '#FAF8F5', textColor: '#141414' },
@@ -837,7 +847,6 @@
                     safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
                 }
 
-                // Mettre à jour l'historique existant pour garder la trace complète
                 const history = getHistoryList();
                 const idx = history.findIndex(item => item.promoCode === cleanCode);
                 if (idx !== -1) {
@@ -850,7 +859,6 @@
                     safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
                 }
 
-                // Synchronisation immédiate avec la base partagée (autre appareil)
                 await callSharedBackend('consume_code', {
                     code: cleanCode,
                     consumedCodeHash,
@@ -919,13 +927,19 @@
             const winModal = document.getElementById('winModal');
             const winModalContent = document.getElementById('winModalContent');
             const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalCrownBadge = document.getElementById('modalCrownBadge');
             const modalSubtitleBadge = document.getElementById('modalSubtitleBadge');
             const modalPrizeTitle = document.getElementById('modalPrizeTitle');
             const modalPrizeDetail = document.getElementById('modalPrizeDetail');
             const modalPromoCode = document.getElementById('modalPromoCode');
             const copyCodeBtn = document.getElementById('copyCodeBtn');
             const copyBtnText = document.getElementById('copyBtnText');
+            const modalUsedWarningBox = document.getElementById('modalUsedWarningBox');
+            const modalUsedWarningText = document.getElementById('modalUsedWarningText');
             const whatsappClaimBtn = document.getElementById('whatsappClaimBtn');
+            const whatsappClaimIcon = document.getElementById('whatsappClaimIcon');
+            const whatsappClaimLabel = document.getElementById('whatsappClaimLabel');
+            const modalFooterNote = document.getElementById('modalFooterNote');
 
             const openAdminVerifyBtn = document.getElementById('openAdminVerifyBtn');
             const adminModal = document.getElementById('adminModal');
@@ -950,6 +964,7 @@
             let audioCtx = null;
             let lastTickIndex = -1;
             let isAdminUnlocked = false;
+            let currentModalCodeLocked = false;
 
             // =========================================================================
             // 8. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
@@ -1236,36 +1251,76 @@
                     syncUIWithSavedState();
                 }
 
-                openWinModal(resultData);
+                await openWinModal(resultData);
             }
 
-            function openWinModal(data) {
-                const used = isPromoCodeConsumed(data.promoCode);
-                modalSubtitleBadge.textContent = used
-                    ? 'CODE DÉJÀ UTILISÉ • BLOQUÉ'
-                    : (data.isDemo
-                        ? 'MODE DÉMO • CODE CERTIFIÉ'
-                        : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`);
+            async function openWinModal(data) {
+                await fetchRemoteCodeStatus(data.promoCode);
+                const usedEntry = getConsumedEntry(data.promoCode);
+                const used = Boolean(usedEntry);
+                currentModalCodeLocked = used;
 
                 modalPrizeTitle.textContent = `${data.percentageWon} DE RÉDUCTION`;
                 modalPrizeDetail.textContent = `Appliqué sur votre service : ${data.desiredService}`;
                 modalPromoCode.textContent = data.promoCode;
                 copyBtnText.textContent = 'Copier le code';
 
-                const messageLines = [
-                    `Bonjour Tunisian Careers Academy ! 🎓🇩🇪`,
-                    `Je viens de participer à la *Roue Black Friday TCA* !`,
-                    ``,
-                    `👤 *Nom :* ${data.fullName}`,
-                    data.whatsappPhone ? `📱 *Téléphone :* ${data.whatsappPhone}` : ``,
-                    `🎁 *Remise gagnée :* ${data.percentageWon}`,
-                    `📌 *Service choisi :* ${data.desiredService}`,
-                    `🎟️ *Code Promo Certifié :* ${data.promoCode}`,
-                    ``,
-                    `Je souhaite réclamer mon offre Black Friday dès maintenant !`
-                ].filter(line => line !== '');
-                const encodedMessage = encodeURIComponent(messageLines.join('\n'));
-                whatsappClaimBtn.href = `https://wa.me/${TCA_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                if (used) {
+                    modalCrownBadge.className = 'w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/50 text-amber-400 flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl';
+                    modalCrownBadge.innerHTML = '<i class="fas fa-ban"></i>';
+
+                    modalSubtitleBadge.textContent = 'CODE DÉJÀ UTILISÉ • BLOQUÉ';
+                    modalSubtitleBadge.className = 'inline-block text-xs font-extrabold uppercase tracking-widest text-amber-300 bg-amber-500/20 border border-amber-500/40 px-3.5 py-1 rounded-full mb-2';
+
+                    modalPromoCode.classList.add('line-through', 'opacity-60');
+                    modalUsedWarningBox.classList.remove('hidden');
+                    modalUsedWarningText.textContent = usedEntry && usedEntry.usedAt
+                        ? `Ce code promo a déjà été utilisé le ${usedEntry.usedAt}. L'envoi de réclamation WhatsApp est désactivé.`
+                        : `Ce code promo a déjà été validé par l'équipe TCA. L'envoi de réclamation WhatsApp est désactivé.`;
+
+                    whatsappClaimBtn.href = '#';
+                    whatsappClaimBtn.removeAttribute('target');
+                    whatsappClaimBtn.setAttribute('aria-disabled', 'true');
+                    whatsappClaimBtn.className = 'w-full py-3.5 px-5 rounded-xl bg-gray-700/80 border border-white/10 text-gray-400 font-extrabold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-not-allowed select-none';
+                    whatsappClaimIcon.className = 'fas fa-lock text-lg text-amber-400';
+                    whatsappClaimLabel.textContent = 'Code déjà utilisé — Réclamation bloquée';
+
+                    modalFooterNote.textContent = 'Ce code a déjà été consommé et ne peut plus être réclamé.';
+                } else {
+                    modalCrownBadge.className = 'w-16 h-16 rounded-2xl bg-gradient-to-br from-tca-gold to-yellow-600 text-tca-dark flex items-center justify-center mx-auto mb-4 shadow-lg text-3xl animate-bounce';
+                    modalCrownBadge.innerHTML = '<i class="fas fa-crown"></i>';
+
+                    modalSubtitleBadge.textContent = data.isDemo
+                        ? 'MODE DÉMO • CODE CERTIFIÉ'
+                        : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`;
+                    modalSubtitleBadge.className = 'inline-block text-xs font-extrabold uppercase tracking-widest text-tca-gold bg-tca-gold/15 px-3.5 py-1 rounded-full mb-2';
+
+                    modalPromoCode.classList.remove('line-through', 'opacity-60');
+                    modalUsedWarningBox.classList.add('hidden');
+
+                    const messageLines = [
+                        `Bonjour Tunisian Careers Academy ! 🎓🇩🇪`,
+                        `Je viens de participer à la *Roue Black Friday TCA* !`,
+                        ``,
+                        `👤 *Nom :* ${data.fullName}`,
+                        data.whatsappPhone ? `📱 *Téléphone :* ${data.whatsappPhone}` : ``,
+                        `🎁 *Remise gagnée :* ${data.percentageWon}`,
+                        `📌 *Service choisi :* ${data.desiredService}`,
+                        `🎟️ *Code Promo Certifié :* ${data.promoCode}`,
+                        ``,
+                        `Je souhaite réclamer mon offre Black Friday dès maintenant !`
+                    ].filter(line => line !== '');
+                    const encodedMessage = encodeURIComponent(messageLines.join('\n'));
+
+                    whatsappClaimBtn.href = `https://wa.me/${TCA_WHATSAPP_NUMBER}?text=${encodedMessage}`;
+                    whatsappClaimBtn.setAttribute('target', '_blank');
+                    whatsappClaimBtn.removeAttribute('aria-disabled');
+                    whatsappClaimBtn.className = 'w-full py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5';
+                    whatsappClaimIcon.className = 'fab fa-whatsapp text-xl';
+                    whatsappClaimLabel.textContent = 'Réclamer sur WhatsApp (+216 29 664 429)';
+
+                    modalFooterNote.textContent = 'Une fois utilisé, ce code est bloqué définitivement sur tous les appareils.';
+                }
 
                 winModal.classList.remove('hidden');
                 winModal.classList.add('flex');
@@ -1495,9 +1550,13 @@
                     if (isPromoCodeConsumed(saved.promoCode)) {
                         savedCodeStatus.textContent = 'DÉJÀ UTILISÉ (BLOQUÉ)';
                         savedCodeStatus.className = 'text-xs font-bold text-amber-400';
+                        reopenModalBtn.innerHTML = '<i class="fas fa-ban"></i> Voir mon reçu (Code déjà utilisé)';
+                        reopenModalBtn.className = 'w-full py-3 px-4 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-200 font-bold text-sm transition flex items-center justify-center gap-2 cursor-pointer';
                     } else {
                         savedCodeStatus.textContent = 'ACTIF (USAGE UNIQUE)';
                         savedCodeStatus.className = 'text-xs font-bold text-emerald-400';
+                        reopenModalBtn.innerHTML = '<i class="fas fa-gift"></i> Afficher mon bon & Réclamer';
+                        reopenModalBtn.className = 'w-full py-3 px-4 rounded-xl bg-tca-gold hover:bg-yellow-500 text-tca-dark font-bold text-sm transition flex items-center justify-center gap-2 cursor-pointer';
                     }
                 } else {
                     formContainer.classList.remove('hidden');
@@ -1528,7 +1587,7 @@
             async function handleValidatedFormSpin() {
                 const saved = getSavedPlayerState();
                 if (saved) {
-                    openWinModal(saved);
+                    await openWinModal(saved);
                     return;
                 }
 
@@ -1557,7 +1616,7 @@
                         `Ce numéro (${whatsappPhone}) a déjà participé et reçu le code ${existingRecord.promoCode} (${existingRecord.percentageWon}). Aucune nouvelle participation n'est autorisée.`,
                         'warning'
                     );
-                    openWinModal(existingRecord);
+                    await openWinModal(existingRecord);
                     return;
                 }
 
@@ -1589,9 +1648,18 @@
                 });
             });
 
-            reopenModalBtn.addEventListener('click', () => {
+            reopenModalBtn.addEventListener('click', async () => {
                 const saved = getSavedPlayerState();
-                if (saved) openWinModal(saved);
+                if (saved) await openWinModal(saved);
+            });
+
+            whatsappClaimBtn.addEventListener('click', (e) => {
+                const currentCode = modalPromoCode.textContent.trim();
+                if (currentModalCodeLocked || isPromoCodeConsumed(currentCode)) {
+                    e.preventDefault();
+                    modalUsedWarningBox.classList.remove('hidden');
+                    showInlineAlert(`Le code ${currentCode} a déjà été utilisé et ne peut plus être réclamé sur WhatsApp.`, 'warning');
+                }
             });
 
             closeModalBtn.addEventListener('click', closeWinModal);
