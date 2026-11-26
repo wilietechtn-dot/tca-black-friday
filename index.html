@@ -111,10 +111,10 @@
                     <i id="soundIcon" class="fas fa-volume-up text-tca-gold"></i>
                     <span id="soundLabel" class="hidden sm:inline">Son activé</span>
                 </button>
-                <!-- Bouton Mode Admin -->
-                <button id="adminResetBtn" type="button" class="text-gray-400 hover:text-tca-gold bg-white/5 hover:bg-white/10 px-2.5 py-1 rounded-full transition flex items-center gap-1.5 cursor-pointer" title="Réinitialiser l'essai pour tester à nouveau">
-                    <i class="fas fa-unlock-alt text-xs"></i>
-                    <span>Réinitialiser (Admin)</span>
+                <!-- Bouton Vérifier un code (Admin) -->
+                <button id="openAdminVerifyBtn" type="button" class="text-tca-gold hover:text-white bg-tca-gold/15 hover:bg-tca-gold/25 border border-tca-gold/40 px-3 py-1 rounded-full transition flex items-center gap-1.5 font-semibold cursor-pointer" title="Vérifier un code promo client">
+                    <i class="fas fa-shield-alt text-xs"></i>
+                    <span>Vérifier un code (Admin)</span>
                 </button>
             </div>
         </div>
@@ -345,7 +345,7 @@
                                 <span id="savedPrizeLabel" class="text-tca-gold font-bold"></span>
                             </div>
                             <div class="flex justify-between items-center text-xs text-gray-400 pt-2 border-t border-white/10">
-                                <span>Code Promo :</span>
+                                <span>Code Promo Signé :</span>
                                 <span id="savedPromoCode" class="font-mono font-bold text-sm text-white bg-tca-red/20 border border-tca-red/40 px-2.5 py-0.5 rounded-lg"></span>
                             </div>
                         </div>
@@ -405,14 +405,14 @@
                     </p>
                 </div>
 
-                <!-- Code Promo Unique -->
+                <!-- Code Promo Unique Signé -->
                 <div class="mb-5">
                     <p class="text-xs text-gray-400 uppercase tracking-wider mb-1.5 font-semibold">
-                        Votre code promo unique Black Friday
+                        Votre code promo certifié Black Friday
                     </p>
                     <div class="flex items-center justify-between bg-black/70 border border-dashed border-tca-gold rounded-xl p-2 pl-4">
                         <span id="modalPromoCode" class="font-mono text-base sm:text-lg font-extrabold text-tca-gold tracking-wider select-all">
-                            TCA-BF20-8492
+                            TCA-20-X8K2-7M
                         </span>
                         <button id="copyCodeBtn" type="button"
                             class="bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 transition cursor-pointer">
@@ -426,12 +426,105 @@
                 <a id="whatsappClaimBtn" href="#" target="_blank" rel="noopener noreferrer"
                     class="w-full py-3.5 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-black font-extrabold text-sm sm:text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2.5 transition transform hover:-translate-y-0.5">
                     <i class="fab fa-whatsapp text-xl"></i>
-                    <span>Réclamer mon offre sur WhatsApp</span>
+                    <span>Réclamer sur WhatsApp (+216 29 664 429)</span>
                 </a>
 
                 <p class="text-[11px] text-gray-400 mt-3">
-                    Présentez ce code lors de votre échange avec notre équipe TCA (+216 29 664 429).
+                    Ce code signé est vérifié par notre équipe TCA lors de votre inscription.
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE ADMIN : VÉRIFICATION DE CODE & HISTORIQUE -->
+    <div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity">
+        <div id="adminModalContent" class="bg-tca-card border border-tca-gold/60 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative transform transition-all scale-95 opacity-0 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Bouton fermer -->
+            <button id="closeAdminModalBtn" type="button" aria-label="Fermer le panneau Admin"
+                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition cursor-pointer">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- En-tête Panneau Admin -->
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-tca-gold/15 border border-tca-gold/40 text-tca-gold flex items-center justify-center text-lg">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold text-white">Vérification Admin TCA</h3>
+                    <p class="text-xs text-gray-400">Contrôle d'authenticité mathématique des codes Black Friday</p>
+                </div>
+            </div>
+
+            <!-- ÉTAPE A : Connexion PIN / Mot de passe Admin -->
+            <div id="adminAuthSection" class="space-y-4">
+                <div class="bg-black/50 border border-white/10 rounded-2xl p-4">
+                    <label for="adminPasswordInput" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                        Mot de passe Administrateur TCA
+                    </label>
+                    <form id="adminLoginForm" class="flex flex-col sm:flex-row gap-2.5">
+                        <input type="password" id="adminPasswordInput" placeholder="Entrez le code PIN Admin..."
+                            class="flex-grow px-4 py-2.5 bg-black/70 border border-white/15 rounded-xl text-white text-sm focus:outline-none focus:border-tca-gold">
+                        <button type="submit"
+                            class="px-5 py-2.5 rounded-xl bg-tca-gold hover:bg-yellow-500 text-tca-dark font-bold text-sm transition cursor-pointer whitespace-nowrap">
+                            Déverrouiller
+                        </button>
+                    </form>
+                    <p id="adminAuthError" class="hidden text-xs text-red-400 mt-2 flex items-center gap-1.5">
+                        <i class="fas fa-exclamation-circle"></i> Mot de passe incorrect.
+                    </p>
+                   
+                </div>
+            </div>
+
+            <!-- ÉTAPE B : Outil de Vérification & Historique (déverrouillé) -->
+            <div id="adminDashboardSection" class="hidden space-y-5">
+                
+                <!-- Formulaire de vérification d'un code -->
+                <div class="bg-black/50 border border-white/10 rounded-2xl p-4">
+                    <label for="verifyCodeInput" class="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+                        Entrer le code promo du client (ex: TCA-15-XXXX-XX)
+                    </label>
+                    <form id="verifyCodeForm" class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="verifyCodeInput" placeholder="TCA-15-XXXX-XX" autocomplete="off"
+                            class="flex-grow px-3.5 py-2.5 bg-black/80 border border-white/15 rounded-xl text-white font-mono uppercase text-sm focus:outline-none focus:border-tca-gold">
+                        <button type="submit"
+                            class="px-4 py-2.5 rounded-xl bg-tca-red hover:bg-tca-redDark text-white font-bold text-sm transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap">
+                            <i class="fas fa-search"></i> Vérifier l'authenticité
+                        </button>
+                    </form>
+
+                    <!-- Zone de Résultat de Vérification -->
+                    <div id="verifyResultBox" class="hidden mt-4 rounded-xl p-4 border transition-all">
+                        <!-- Contenu injecté dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Historique local des codes générés / vérifiés -->
+                <div class="bg-black/40 border border-white/10 rounded-2xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-1.5">
+                            <i class="fas fa-history text-tca-gold"></i> Historique sur cet appareil
+                        </h4>
+                        <span id="historyCountBadge" class="text-[11px] bg-white/10 text-gray-300 px-2 py-0.5 rounded-full">0</span>
+                    </div>
+                    <div id="adminHistoryList" class="space-y-2 max-h-44 overflow-y-auto pr-1 text-xs">
+                        <!-- Liste injectée dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Actions Admin (Réinitialiser l'essai joueur / Verrouiller) -->
+                <div class="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between gap-2">
+                    <button id="adminResetPlayerBtn" type="button"
+                        class="text-xs bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/15 px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-redo-alt text-tca-gold"></i> Réinitialiser le tour d'essai
+                    </button>
+                    <button id="adminLockBtn" type="button"
+                        class="text-xs text-gray-400 hover:text-red-400 px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fas fa-lock"></i> Verrouiller Admin
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -440,38 +533,47 @@
     <script>
         (function () {
             // =========================================================================
-            // 1. CONFIGURATION DES 8 SEGMENTS (-5%, -10%, -15%, -20%) & POIDS
+            // 1. CONFIGURATION & CLÉS DE SÉCURITÉ TCA
             // =========================================================================
+            const TCA_SECRET_KEY = 'TCA_BF_2026_SECRET';
+            const TCA_ADMIN_PIN = 'TCA2026';
+            const TCA_WHATSAPP_NUMBER = '21629664429';
+            const ALLOWED_PERCENTAGES = ['05', '10', '15', '20'];
+
+            const STORAGE_KEY_PLAYER = 'tca_bf_wheel_player_v5';
+            const STORAGE_KEY_HISTORY = 'tca_bf_wheel_history_v5';
+            const STORAGE_KEY_CONSUMED = 'tca_bf_wheel_consumed_v5';
+
             const SEGMENTS = [
                 {
                     id: 'pct-5-a',
                     percentage: '-5%',
-                    codePrefix: 'TCA-BF05',
+                    pctCode: '05',
                     weight: 30,
-                    bgColor: '#FAF8F5', // Crème TCA
+                    bgColor: '#FAF8F5',
                     textColor: '#141414'
                 },
                 {
                     id: 'pct-10-a',
                     percentage: '-10%',
-                    codePrefix: 'TCA-BF10',
+                    pctCode: '10',
                     weight: 22,
-                    bgColor: '#1E1E1E', // Noir profond TCA
+                    bgColor: '#1E1E1E',
                     textColor: '#FAF8F5'
                 },
                 {
                     id: 'pct-15-a',
                     percentage: '-15%',
-                    codePrefix: 'TCA-BF15',
+                    pctCode: '15',
                     weight: 12,
-                    bgColor: '#DC2626', // Rouge signature TCA
+                    bgColor: '#DC2626',
                     textColor: '#FFFFFF'
                 },
                 {
                     id: 'pct-20-a',
                     percentage: '-20%',
-                    codePrefix: 'TCA-BF20',
-                    weight: 4, // Offre majeure Or Black Friday
+                    pctCode: '20',
+                    weight: 4,
                     bgColor: '#D4AF37',
                     textColor: '#141414',
                     isTopOffer: true
@@ -479,40 +581,37 @@
                 {
                     id: 'pct-5-b',
                     percentage: '-5%',
-                    codePrefix: 'TCA-BF05',
+                    pctCode: '05',
                     weight: 30,
-                    bgColor: '#FAF8F5', // Crème TCA
+                    bgColor: '#FAF8F5',
                     textColor: '#141414'
                 },
                 {
                     id: 'pct-10-b',
                     percentage: '-10%',
-                    codePrefix: 'TCA-BF10',
+                    pctCode: '10',
                     weight: 22,
-                    bgColor: '#1E1E1E', // Noir profond TCA
+                    bgColor: '#1E1E1E',
                     textColor: '#FAF8F5'
                 },
                 {
                     id: 'pct-15-b',
                     percentage: '-15%',
-                    codePrefix: 'TCA-BF15',
+                    pctCode: '15',
                     weight: 12,
-                    bgColor: '#DC2626', // Rouge signature TCA
+                    bgColor: '#DC2626',
                     textColor: '#FFFFFF'
                 },
                 {
                     id: 'pct-20-b',
                     percentage: '-20%',
-                    codePrefix: 'TCA-BF20',
-                    weight: 4, // Offre majeure Or Black Friday
+                    pctCode: '20',
+                    weight: 4,
                     bgColor: '#D4AF37',
                     textColor: '#141414',
                     isTopOffer: true
                 }
             ];
-
-            const STORAGE_KEY = 'tca_bf_wheel_state_v4';
-            const TCA_WHATSAPP_NUMBER = '21629664429';
 
             // =========================================================================
             // 2. STOCKAGE SÉCURISÉ (AVEC REPLI EN MÉMOIRE SI IFRAME SANDBOXÉE)
@@ -530,22 +629,126 @@
                     memoryStorage[key] = value;
                     try {
                         window.localStorage.setItem(key, value);
-                    } catch (e) {
-                        // Ignorer silencieusement si localStorage est bloqué par le navigateur
-                    }
+                    } catch (e) {}
                 },
                 removeItem(key) {
                     delete memoryStorage[key];
                     try {
                         window.localStorage.removeItem(key);
-                    } catch (e) {
-                        // Ignorer silencieusement
-                    }
+                    } catch (e) {}
                 }
             };
 
             // =========================================================================
-            // 3. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
+            // 3. ALGORITHME DÉTERMINISTE DE SIGNATURE & VÉRIFICATION DE CODE
+            // Format : TCA-[POURCENTAGE]-[4LETTRES_CHIFFRES]-[2CARACTERES_CHECKSUM]
+            // Exemple : TCA-15-X8K2-7M
+            // =========================================================================
+            const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+            function computeSignatureChecksum(pctCode, randomToken) {
+                const payload = `${TCA_SECRET_KEY}|TCA|${pctCode}|${randomToken}`;
+                let h1 = 0x811c9dc5;
+                let h2 = 0x1b873593;
+
+                for (let i = 0; i < payload.length; i++) {
+                    const ch = payload.charCodeAt(i);
+                    h1 ^= ch;
+                    h1 = Math.imul(h1, 0x01000193);
+                    h2 ^= (ch + i * 17);
+                    h2 = Math.imul(h2, 0x85ebca6b);
+                }
+
+                const c1 = CODE_ALPHABET[Math.abs(h1 >>> 0) % CODE_ALPHABET.length];
+                const c2 = CODE_ALPHABET[Math.abs(h2 >>> 0) % CODE_ALPHABET.length];
+                return `${c1}${c2}`;
+            }
+
+            function generateSignedPromoCode(pctCode) {
+                let token = '';
+                for (let i = 0; i < 4; i++) {
+                    token += CODE_ALPHABET.charAt(Math.floor(Math.random() * CODE_ALPHABET.length));
+                }
+                const checksum = computeSignatureChecksum(pctCode, token);
+                return `TCA-${pctCode}-${token}-${checksum}`;
+            }
+
+            function verifySignedPromoCode(rawCode) {
+                const cleaned = (rawCode || '').trim().toUpperCase();
+                const regex = /^TCA-(05|10|15|20)-([A-Z2-9]{4})-([A-Z2-9]{2})$/;
+                const match = cleaned.match(regex);
+
+                if (!match) {
+                    return {
+                        valid: false,
+                        code: cleaned,
+                        reason: 'Format invalide. Le code doit respecter la structure TCA-XX-XXXX-XX.'
+                    };
+                }
+
+                const pctCode = match[1];
+                const token = match[2];
+                const providedChecksum = match[3];
+                const expectedChecksum = computeSignatureChecksum(pctCode, token);
+
+                if (providedChecksum !== expectedChecksum) {
+                    return {
+                        valid: false,
+                        code: cleaned,
+                        reason: 'Signature mathématique incorrecte : ce code a été modifié ou falsifié.'
+                    };
+                }
+
+                const pctNumeric = parseInt(pctCode, 10);
+                return {
+                    valid: true,
+                    code: cleaned,
+                    pctCode: pctCode,
+                    percentageLabel: `-${pctNumeric}%`
+                };
+            }
+
+            // =========================================================================
+            // 4. GESTION DE L'HISTORIQUE & DES CODES CONSOMMÉS
+            // =========================================================================
+            function getHistoryList() {
+                try {
+                    const raw = safeStorage.getItem(STORAGE_KEY_HISTORY);
+                    return raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function saveToHistory(entry) {
+                const list = getHistoryList();
+                const existingIndex = list.findIndex(item => item.promoCode === entry.promoCode);
+                if (existingIndex === -1) {
+                    list.unshift(entry);
+                    safeStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(list.slice(0, 50)));
+                }
+            }
+
+            function getConsumedMap() {
+                try {
+                    const raw = safeStorage.getItem(STORAGE_KEY_CONSUMED);
+                    return raw ? JSON.parse(raw) : {};
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            function markCodeAsConsumed(code, metadata = {}) {
+                const consumed = getConsumedMap();
+                consumed[code] = {
+                    usedAt: new Date().toLocaleString('fr-FR'),
+                    ...metadata
+                };
+                safeStorage.setItem(STORAGE_KEY_CONSUMED, JSON.stringify(consumed));
+            }
+
+            // =========================================================================
+            // 5. RÉFÉRENCES DOM & ÉTAT DE L'APPLICATION
             // =========================================================================
             const canvas = document.getElementById('wheelCanvas');
             const ctx = canvas.getContext('2d');
@@ -553,7 +756,6 @@
             const centerSpinBtn = document.getElementById('centerSpinBtn');
             const playerForm = document.getElementById('playerForm');
             const demoSpinBtn = document.getElementById('demoSpinBtn');
-            const adminResetBtn = document.getElementById('adminResetBtn');
             const soundToggleBtn = document.getElementById('soundToggleBtn');
             const soundIcon = document.getElementById('soundIcon');
             const soundLabel = document.getElementById('soundLabel');
@@ -580,14 +782,33 @@
             const copyBtnText = document.getElementById('copyBtnText');
             const whatsappClaimBtn = document.getElementById('whatsappClaimBtn');
 
-            let currentRotation = 0; // En radians
+            // Références Panneau Admin
+            const openAdminVerifyBtn = document.getElementById('openAdminVerifyBtn');
+            const adminModal = document.getElementById('adminModal');
+            const adminModalContent = document.getElementById('adminModalContent');
+            const closeAdminModalBtn = document.getElementById('closeAdminModalBtn');
+            const adminAuthSection = document.getElementById('adminAuthSection');
+            const adminDashboardSection = document.getElementById('adminDashboardSection');
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            const adminPasswordInput = document.getElementById('adminPasswordInput');
+            const adminAuthError = document.getElementById('adminAuthError');
+            const verifyCodeForm = document.getElementById('verifyCodeForm');
+            const verifyCodeInput = document.getElementById('verifyCodeInput');
+            const verifyResultBox = document.getElementById('verifyResultBox');
+            const adminHistoryList = document.getElementById('adminHistoryList');
+            const historyCountBadge = document.getElementById('historyCountBadge');
+            const adminResetPlayerBtn = document.getElementById('adminResetPlayerBtn');
+            const adminLockBtn = document.getElementById('adminLockBtn');
+
+            let currentRotation = 0;
             let isSpinning = false;
             let soundEnabled = true;
             let audioCtx = null;
             let lastTickIndex = -1;
+            let isAdminUnlocked = false;
 
             // =========================================================================
-            // 4. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
+            // 6. SYNTHÈSE AUDIO SÉCURISÉE (WEB AUDIO API)
             // =========================================================================
             function initAudio() {
                 try {
@@ -600,9 +821,7 @@
                     if (audioCtx && audioCtx.state === 'suspended') {
                         audioCtx.resume();
                     }
-                } catch (e) {
-                    // Audio non disponible
-                }
+                } catch (e) {}
             }
 
             function playTickSound() {
@@ -631,7 +850,7 @@
                 try {
                     initAudio();
                     if (!audioCtx) return;
-                    const notes = [523.25, 659.25, 783.99, 1046.50]; // Do5, Mi5, Sol5, Do6
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
                     notes.forEach((freq, idx) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -652,7 +871,7 @@
             }
 
             // =========================================================================
-            // 5. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
+            // 7. DESSIN RESPONSIVE DU CANVAS DE LA ROUE
             // =========================================================================
             function drawWheel() {
                 if (!canvas || !ctx) return;
@@ -674,12 +893,10 @@
 
                 ctx.clearRect(0, 0, size, size);
 
-                // Dessiner chaque quartier
                 SEGMENTS.forEach((seg, i) => {
                     const startAngle = currentRotation + i * arcSize;
                     const endAngle = startAngle + arcSize;
 
-                    // Secteur coloré
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
                     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -687,12 +904,10 @@
                     ctx.fillStyle = seg.bgColor;
                     ctx.fill();
 
-                    // Séparation dorée
                     ctx.lineWidth = 2.5;
                     ctx.strokeStyle = 'rgba(212, 175, 55, 0.8)';
                     ctx.stroke();
 
-                    // Texte : UNIQUEMENT le pourcentage en grand format
                     ctx.save();
                     ctx.translate(centerX, centerY);
                     ctx.rotate(startAngle + arcSize / 2);
@@ -715,7 +930,6 @@
                     ctx.fillText(seg.percentage, textRadius, 1);
                     ctx.restore();
 
-                    // Clou doré sur le bord extérieur
                     const pinX = centerX + Math.cos(startAngle) * (radius - 9);
                     const pinY = centerY + Math.sin(startAngle) * (radius - 9);
                     ctx.beginPath();
@@ -727,7 +941,6 @@
                     ctx.stroke();
                 });
 
-                // Anneau intérieur décoratif autour du bouton central
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, radius * 0.25, 0, 2 * Math.PI);
                 ctx.fillStyle = '#141414';
@@ -738,7 +951,7 @@
             }
 
             // =========================================================================
-            // 6. TIRAGE PONDÉRÉ & CALCUL EXACT DE L'ANGLE SOUS LE POINTEUR DU HAUT
+            // 8. TIRAGE PONDÉRÉ & ANIMATION DE ROTATION
             // =========================================================================
             function pickWeightedSegmentIndex() {
                 const totalWeight = SEGMENTS.reduce((sum, s) => sum + s.weight, 0);
@@ -755,7 +968,6 @@
             function getSegmentIndexUnderTopPointer(rotationRad) {
                 const numSegments = SEGMENTS.length;
                 const arcSize = (2 * Math.PI) / numSegments;
-                // Le pointeur supérieur est à -PI/2 (ou 3*PI/2) dans le repère Canvas
                 const pointerAngle = (3 * Math.PI) / 2;
                 const normalizedRot = ((rotationRad % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
                 const relativeAngle = ((pointerAngle - normalizedRot) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
@@ -774,19 +986,15 @@
                 const numSegments = SEGMENTS.length;
                 const arcSize = (2 * Math.PI) / numSegments;
 
-                // Centre du segment gagnant dans le repère de la roue
                 const segmentCenterAngle = winningIndex * arcSize + arcSize / 2;
-                // Léger décalage aléatoire naturel à l'intérieur du segment (±30%)
                 const jitter = (Math.random() - 0.5) * (arcSize * 0.6);
                 const pointerAngle = (3 * Math.PI) / 2;
 
-                // Angle cible normalisé pour que le segment gagnant s'arrête pile sous le pointeur en haut
                 const targetNormalized = ((pointerAngle - (segmentCenterAngle + jitter)) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
                 const currentNormalized = ((currentRotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
                 let deltaAngle = targetNormalized - currentNormalized;
                 if (deltaAngle <= 0) deltaAngle += 2 * Math.PI;
 
-                // 6 à 8 tours complets avant l'arrêt
                 const extraSpins = (6 + Math.floor(Math.random() * 3)) * 2 * Math.PI;
                 const totalRotationDelta = extraSpins + deltaAngle;
 
@@ -795,7 +1003,6 @@
                 const durationMs = 4600;
                 const startTime = performance.now();
 
-                // Courbe d'accélération puis décélération fluide (easeOutQuart)
                 function easeOutQuart(t) {
                     return 1 - Math.pow(1 - t, 4);
                 }
@@ -808,7 +1015,6 @@
                     currentRotation = startRotation + totalRotationDelta * eased;
                     drawWheel();
 
-                    // Détection du passage d'un segment sous le pointeur pour le clic sonore et l'animation
                     const activeIdx = getSegmentIndexUnderTopPointer(currentRotation);
                     if (activeIdx !== lastTickIndex) {
                         lastTickIndex = activeIdx;
@@ -841,17 +1047,8 @@
             }
 
             // =========================================================================
-            // 7. GESTION DE FIN DE TOUR, CODE PROMO, CONFETTIS & WHATSAPP
+            // 9. GESTION DE FIN DE TOUR, CODE SIGNÉ, CONFETTIS & WHATSAPP
             // =========================================================================
-            function generatePromoCode(prefix) {
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                let suffix = '';
-                for (let i = 0; i < 4; i++) {
-                    suffix += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return `${prefix}-${suffix}`;
-            }
-
             function launchConfetti() {
                 if (typeof confetti !== 'function') return;
                 try {
@@ -868,21 +1065,23 @@
                 playWinFanfare();
                 launchConfetti();
 
-                const promoCode = isDemo
-                    ? `${winningSegment.codePrefix}-DEMO`
-                    : generatePromoCode(winningSegment.codePrefix);
+                // Générer un code signé mathématiquement (même en mode démo, il est authentifiable !)
+                const signedCode = generateSignedPromoCode(winningSegment.pctCode);
 
                 const resultData = {
                     fullName: isDemo ? 'Visiteur Démo' : fullName,
                     whatsappPhone: isDemo ? '' : whatsappPhone,
                     desiredService: desiredService,
                     percentageWon: winningSegment.percentage,
-                    promoCode: promoCode,
+                    promoCode: signedCode,
+                    createdAt: new Date().toLocaleString('fr-FR'),
                     isDemo: isDemo
                 };
 
+                saveToHistory(resultData);
+
                 if (!isDemo) {
-                    safeStorage.setItem(STORAGE_KEY, JSON.stringify(resultData));
+                    safeStorage.setItem(STORAGE_KEY_PLAYER, JSON.stringify(resultData));
                     syncUIWithSavedState();
                 }
 
@@ -891,7 +1090,7 @@
 
             function openWinModal(data) {
                 modalSubtitleBadge.textContent = data.isDemo
-                    ? 'MODE DÉMO • APERÇU DU GAIN'
+                    ? 'MODE DÉMO • CODE CERTIFIÉ'
                     : `FÉLICITATIONS ${data.fullName.toUpperCase()} !`;
 
                 modalPrizeTitle.textContent = `${data.percentageWon} DE RÉDUCTION`;
@@ -906,7 +1105,7 @@
                     `👤 *Nom :* ${data.fullName}`,
                     `🎁 *Remise gagnée :* ${data.percentageWon}`,
                     `📌 *Service choisi :* ${data.desiredService}`,
-                    `🎟️ *Code Promo :* ${data.promoCode}`,
+                    `🎟️ *Code Promo Certifié :* ${data.promoCode}`,
                     ``,
                     `Je souhaite réclamer mon offre Black Friday dès maintenant !`
                 ];
@@ -931,11 +1130,175 @@
             }
 
             // =========================================================================
-            // 8. ÉTAT DU JOUEUR & MESSAGES INTERNES
+            // 10. PANNEAU ADMIN DE VÉRIFICATION DE CODE
             // =========================================================================
-            function getSavedState() {
+            function openAdminModal() {
+                adminModal.classList.remove('hidden');
+                adminModal.classList.add('flex');
+                if (isAdminUnlocked) {
+                    adminAuthSection.classList.add('hidden');
+                    adminDashboardSection.classList.remove('hidden');
+                    renderAdminHistory();
+                } else {
+                    adminAuthSection.classList.remove('hidden');
+                    adminDashboardSection.classList.add('hidden');
+                    adminPasswordInput.value = '';
+                    adminAuthError.classList.add('hidden');
+                }
+                requestAnimationFrame(() => {
+                    adminModalContent.classList.remove('scale-95', 'opacity-0');
+                    adminModalContent.classList.add('scale-100', 'opacity-100');
+                });
+            }
+
+            function closeAdminModal() {
+                adminModalContent.classList.remove('scale-100', 'opacity-100');
+                adminModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    adminModal.classList.add('hidden');
+                    adminModal.classList.remove('flex');
+                }, 200);
+            }
+
+            function renderAdminHistory() {
+                const history = getHistoryList();
+                const consumed = getConsumedMap();
+                historyCountBadge.textContent = history.length;
+
+                if (history.length === 0) {
+                    adminHistoryList.innerHTML = `<p class="text-gray-500 italic py-2 text-center">Aucun tirage enregistré sur cet appareil pour le moment.</p>`;
+                    return;
+                }
+
+                adminHistoryList.innerHTML = history.map(item => {
+                    const isUsed = Boolean(consumed[item.promoCode]);
+                    const statusBadge = isUsed
+                        ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">UTILISÉ</span>`
+                        : `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">VALIDE</span>`;
+
+                    return `
+                        <div class="flex items-center justify-between gap-2 bg-black/60 border border-white/10 rounded-xl p-2.5">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-bold text-tca-gold">${item.promoCode}</span>
+                                    <span class="text-white font-bold">${item.percentageWon}</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 truncate">${item.fullName} • ${item.desiredService}</p>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${statusBadge}
+                                <button type="button" data-inspect-code="${item.promoCode}"
+                                    class="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-gray-200 text-[11px] cursor-pointer" title="Vérifier ce code">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                adminHistoryList.querySelectorAll('[data-inspect-code]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const code = btn.getAttribute('data-inspect-code');
+                        verifyCodeInput.value = code;
+                        performAdminCodeCheck(code);
+                    });
+                });
+            }
+
+            function performAdminCodeCheck(rawInput) {
+                const check = verifySignedPromoCode(rawInput);
+                verifyResultBox.classList.remove('hidden', 'bg-emerald-500/15', 'border-emerald-500/50', 'bg-amber-500/15', 'border-amber-500/50', 'bg-red-500/15', 'border-red-500/50');
+
+                if (!check.valid) {
+                    verifyResultBox.classList.add('bg-red-500/15', 'border-red-500/50');
+                    verifyResultBox.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0 text-lg">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div>
+                                <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-500/30 text-red-200 mb-1">
+                                    CODE INVALIDE OU FALSIFIÉ
+                                </span>
+                                <p class="text-xs text-red-200 mt-1">${check.reason}</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const consumedMap = getConsumedMap();
+                const alreadyUsedInfo = consumedMap[check.code];
+                const localRecord = getHistoryList().find(h => h.promoCode === check.code);
+
+                const localDetailsHtml = localRecord
+                    ? `<p class="text-xs text-gray-300 mt-1">Client : <strong class="text-white">${localRecord.fullName}</strong> (${localRecord.whatsappPhone || 'Démo'}) — Service : <strong class="text-white">${localRecord.desiredService}</strong></p>`
+                    : `<p class="text-xs text-gray-400 mt-1">Code généré depuis un autre appareil (ex: téléphone du client) et certifié authentique par signature TCA.</p>`;
+
+                if (alreadyUsedInfo) {
+                    verifyResultBox.classList.add('bg-amber-500/15', 'border-amber-500/50');
+                    verifyResultBox.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 text-lg">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/30 text-amber-200 mb-1">
+                                    CODE DÉJÀ UTILISÉ
+                                </span>
+                                <p class="text-sm font-bold text-white mt-0.5">
+                                    Code <span class="font-mono text-tca-gold">${check.code}</span> (${check.percentageLabel})
+                                </p>
+                                <p class="text-xs text-amber-200 mt-1">
+                                    Consommé le : <strong>${alreadyUsedInfo.usedAt}</strong>
+                                </p>
+                                ${localDetailsHtml}
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Code authentique & non encore utilisé
+                verifyResultBox.classList.add('bg-emerald-500/15', 'border-emerald-500/50');
+                verifyResultBox.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 text-lg">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <span class="inline-block text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-500/30 text-emerald-200 mb-1">
+                                CODE AUTHENTIQUE & VALIDE
+                            </span>
+                            <p class="text-base font-extrabold text-white mt-0.5">
+                                Réduction certifiée : <span class="text-tca-gold text-lg">${check.percentageLabel}</span>
+                            </p>
+                            <p class="text-xs font-mono text-gray-300 mt-0.5">${check.code}</p>
+                            ${localDetailsHtml}
+                            <button type="button" id="markCodeUsedBtn"
+                                class="mt-3 w-full py-2 px-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-check-double"></i> Marquer ce code comme UTILISÉ
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                const markBtn = document.getElementById('markCodeUsedBtn');
+                if (markBtn) {
+                    markBtn.addEventListener('click', () => {
+                        markCodeAsConsumed(check.code, { percentageLabel: check.percentageLabel });
+                        renderAdminHistory();
+                        performAdminCodeCheck(check.code);
+                    });
+                }
+            }
+
+            // =========================================================================
+            // 11. ÉTAT DU JOUEUR & MESSAGES INTERNES
+            // =========================================================================
+            function getSavedPlayerState() {
                 try {
-                    const raw = safeStorage.getItem(STORAGE_KEY);
+                    const raw = safeStorage.getItem(STORAGE_KEY_PLAYER);
                     return raw ? JSON.parse(raw) : null;
                 } catch (e) {
                     return null;
@@ -943,7 +1306,7 @@
             }
 
             function syncUIWithSavedState() {
-                const saved = getSavedState();
+                const saved = getSavedPlayerState();
                 if (saved) {
                     formContainer.classList.add('hidden');
                     alreadyPlayedContainer.classList.remove('hidden');
@@ -974,10 +1337,10 @@
             }
 
             // =========================================================================
-            // 9. ÉCOUTEURS D'ÉVÉNEMENTS
+            // 12. ÉCOUTEURS D'ÉVÉNEMENTS
             // =========================================================================
             function handleValidatedFormSpin() {
-                const saved = getSavedState();
+                const saved = getSavedPlayerState();
                 if (saved) {
                     openWinModal(saved);
                     return;
@@ -1012,13 +1375,8 @@
                 handleValidatedFormSpin();
             });
 
-            centerSpinBtn.addEventListener('click', () => {
-                handleValidatedFormSpin();
-            });
-
-            canvas.addEventListener('click', () => {
-                handleValidatedFormSpin();
-            });
+            centerSpinBtn.addEventListener('click', handleValidatedFormSpin);
+            canvas.addEventListener('click', handleValidatedFormSpin);
 
             demoSpinBtn.addEventListener('click', () => {
                 const desiredService = document.getElementById('desiredService').value;
@@ -1030,15 +1388,8 @@
                 });
             });
 
-            adminResetBtn.addEventListener('click', () => {
-                if (isSpinning) return;
-                safeStorage.removeItem(STORAGE_KEY);
-                syncUIWithSavedState();
-                showInlineAlert('Session réinitialisée (Mode Admin) : vous pouvez relancer un essai.', 'success');
-            });
-
             reopenModalBtn.addEventListener('click', () => {
-                const saved = getSavedState();
+                const saved = getSavedPlayerState();
                 if (saved) openWinModal(saved);
             });
 
@@ -1074,13 +1425,56 @@
                 }
             });
 
+            // Événements Panneau Admin
+            openAdminVerifyBtn.addEventListener('click', openAdminModal);
+            closeAdminModalBtn.addEventListener('click', closeAdminModal);
+            adminModal.addEventListener('click', (e) => {
+                if (e.target === adminModal) closeAdminModal();
+            });
+
+            adminLoginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const enteredPin = adminPasswordInput.value.trim();
+                if (enteredPin === TCA_ADMIN_PIN) {
+                    isAdminUnlocked = true;
+                    adminAuthError.classList.add('hidden');
+                    adminAuthSection.classList.add('hidden');
+                    adminDashboardSection.classList.remove('hidden');
+                    renderAdminHistory();
+                } else {
+                    adminAuthError.classList.remove('hidden');
+                    adminPasswordInput.focus();
+                }
+            });
+
+            verifyCodeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                performAdminCodeCheck(verifyCodeInput.value);
+            });
+
+            adminResetPlayerBtn.addEventListener('click', () => {
+                if (isSpinning) return;
+                safeStorage.removeItem(STORAGE_KEY_PLAYER);
+                syncUIWithSavedState();
+                closeAdminModal();
+                showInlineAlert('Session joueur réinitialisée : un nouvel essai est disponible.', 'success');
+            });
+
+            adminLockBtn.addEventListener('click', () => {
+                isAdminUnlocked = false;
+                verifyResultBox.classList.add('hidden');
+                verifyCodeInput.value = '';
+                adminDashboardSection.classList.add('hidden');
+                adminAuthSection.classList.remove('hidden');
+                adminPasswordInput.value = '';
+            });
+
             // =========================================================================
-            // 10. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
+            // 13. INITIALISATION IMMÉDIATE AU CHARGEMENT & REDIMENSIONNEMENT
             // =========================================================================
             window.addEventListener('resize', drawWheel);
             syncUIWithSavedState();
             drawWheel();
-            // Redessiner après le chargement complet des polices pour un rendu net
             if (document.fonts && document.fonts.ready) {
                 document.fonts.ready.then(drawWheel);
             }
